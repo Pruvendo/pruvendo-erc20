@@ -1,0 +1,6 @@
+(coq.theory
+ (name ERC20Project)
+ (package ERC20) 
+)
+
+(include_subdirs qualified)
