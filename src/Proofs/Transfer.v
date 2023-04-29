@@ -1,5 +1,6 @@
 Require Import UrsusEnvironment.Solidity.current.Environment.
 Require Import UrsusEnvironment.Solidity.current.LocalGenerator.
+Require Import FinProof.Lib.HMapList.
 
 Require Import UMLang.ExecGenerator.
 
