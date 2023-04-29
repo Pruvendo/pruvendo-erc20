@@ -313,3 +313,128 @@ Proof.
     auto.
 Qed.
 
+Lemma transfer_set_recepient_balance: forall (_to :  address) 
+                            (_value : uint256)
+                            (l: LedgerLRecord rec), 
+    let l0 := {$$ l with Ledger_LocalState := default $$} in
+    let l' := exec_state (Uinterpreter (@transfer rec def _ _ _ _ _to _value)) l0 in
+    let msg_sender := VMState_ι_msg_sender (l.(Ledger_VMState)) in
+    let msg_sender_balance0 := (_balances (l.(Ledger_MainState))) [msg_sender] in
+    let recepient_balance0 := (_balances (l.(Ledger_MainState))) [_to] in
+    _to <> msg_sender -> 
+    (_balances (l'.(Ledger_MainState))) [_to] = 
+        if (xIntGeb msg_sender_balance0  _value : bool) then 
+        xIntPlus recepient_balance0 _value
+        else recepient_balance0.
+Proof.        
+    intros. subst l'.
+    rewrite <- transfer_prf.
+    destruct l. repeat destruct p.   
+    destruct v. repeat destruct p.
+    destruct c. repeat destruct p.
+
+    Opaque Common.hmapFindWithDefault
+           CommonInstances.addAdjustListPair
+           N.add N.sub N.leb N.ltb N.eqb Z.eqb.    
+
+    compute.
+
+    match goal with
+    | |- context [@addAdjustListPair ?K ?V ?H a ?v ?m] => remember (@addAdjustListPair K V H a v m)
+    end.
+
+    match goal with
+    | |- context [if ?b then false else true] => remember b
+    end.    
+    
+    case_eq b; intros.
+
+    match goal with
+    | |- context [@addAdjustListPair ?K ?V ?H ?a ?v ?m] => remember a
+    end.
+
+    vm_compute in Heqp. rewrite Heqp.
+
+    match goal with
+    | |- context [@addAdjustListPair ?K ?V ?H _to ?v ?m] => remember v
+    end.
+
+    erewrite lookup_some_find.
+    reflexivity.    
+
+    unshelve erewrite lookup_addAdjust.
+    refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)).
+
+    match goal with
+    | |- context [if ?b then _ else _] => remember b
+    end.
+
+    assert (b = b0).
+    rewrite Heqb, Heqb0.
+    auto.
+
+    rewrite <- H1, H0.
+    rewrite Heqx16.
+    rewrite Heql3.
+
+    remember (x10 [_to] ?).
+    destruct y.
+
+    erewrite lookup_some_find. 
+    all: cycle 1.
+    
+    unshelve erewrite lookup_addAdjust_another.
+    refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)).
+    setoid_rewrite <- Heqy. reflexivity. 
+    assumption.
+
+    rewrite lookup_none_find.
+
+    match goal with
+    | |- context [@Common.hmapFindWithDefault ?XBool ?XInteger
+                                             ?XList ?XMaybe ?XProd 
+                                             ?XHMap ?H0 ?H1 ?H4 ?H6
+                                             ?K ?V ?v _to ?m ?H7 ] => 
+                                             remember (@Common.hmapFindWithDefault XBool XInteger
+                                             XList XMaybe XProd 
+                                             XHMap H0 H1 H4 H6
+                                             K V v _to m H7) as find_to
+
+    end.
+
+    rewrite lookup_none_find in Heqfind_to.
+    subst find_to. auto. setoid_rewrite <- Heqy. auto.
+
+    unshelve erewrite lookup_addAdjust_another.
+    refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)). 
+    setoid_rewrite <- Heqy. auto.
+    assumption.
+
+    match goal with
+    | |- context [if ?b then _ else _] => remember b
+    end.
+
+    assert (b = b0).
+    rewrite Heqb, Heqb0.
+    auto.
+
+    rewrite <- H1, H0. auto.
+
+    match goal with
+    | |- context [@Common.hmapFindWithDefault ?XBool ?XInteger
+                                             ?XList ?XMaybe ?XProd 
+                                             ?XHMap ?H0 ?H1 ?H4 ?H6
+                                             ?K ?V ?v _to ?m ?H7 ] => 
+                                             remember (@Common.hmapFindWithDefault XBool XInteger
+                                             XList XMaybe XProd 
+                                             XHMap H0 H1 H4 H6
+                                             K V v _to m H7) as find_to
+
+    end.
+
+    erewrite lookup_some_find in Heqfind_to.
+    all: cycle 1. setoid_rewrite <- Heqy.
+    reflexivity.
+    subst find_to.
+    auto. 
+Qed.
