@@ -6,6 +6,11 @@ Require Import UMLang.ExecGenerator.
 Require Import EIP20.
 Import EIP20.
 
+Require Import EvalExecs.Transfer.
+
+#[local]
+Existing Instance BoolEq.pair_eqb_spec.
+
 #[global, program]
 Instance listInfinite : listInfiniteFunRec_gen XList.
 Next Obligation.
@@ -43,172 +48,6 @@ Definition tvm_pubkey_right (rec: Type) (def: XDefault rec) := tvm_pubkey.
 Definition _now_right (rec: Type) (def: XDefault rec) := \\ now \\.
  *)
 
-Check constructor.
-
-Definition constructor_exec_sig (_initialAmount :  uint256) 
-                                (_tokenName :  string) 
-                                (_decimalUnits :  uint8) 
-                                (_tokenSymbol :  string) (l : LedgerLRecord rec) :
-                                {t | t = exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) l}.
-  unfold constructor. unfold dynamicAssignL.
-  unfold totalSupply_left, balances_left, name_left, symbol_left, decimals_left.
-  repeat auto_build_P listInfinite.
-Defined.
-
-Definition constructor_exec_let (_initialAmount :  uint256) 
-                                (_tokenName :  string) 
-                                (_decimalUnits :  uint8) 
-                                (_tokenSymbol :  string) (l : LedgerLRecord rec) : LedgerLRecord rec.
-  let_term_of_2 @constructor_exec_sig (constructor_exec_sig _initialAmount _tokenName _decimalUnits _tokenSymbol l).
-Defined.
-
-(* Print constructor_exec_let. *)
-
-Definition constructor_exec (_initialAmount :  uint256) 
-                            (_tokenName :  string) 
-                            (_decimalUnits :  uint8) 
-                            (_tokenSymbol :  string) (l : LedgerLRecord rec) : LedgerLRecord rec.
-  flat_term_of_2 @constructor_exec_let (constructor_exec_let _initialAmount _tokenName _decimalUnits _tokenSymbol l).
-Defined.
-
-Definition constructor_prf (_initialAmount :  uint256) 
-                            (_tokenName :  string) 
-                            (_decimalUnits :  uint8) 
-                            (_tokenSymbol :  string) (l : LedgerLRecord rec) :
-  constructor_exec _initialAmount _tokenName _decimalUnits _tokenSymbol l = 
-  exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) l.
-  proof_of_2 constructor_exec constructor_exec_sig (constructor_exec_sig _initialAmount _tokenName _decimalUnits _tokenSymbol l).
-Defined.
-
-
-Print constructor_exec.
-
-
-Definition transfer_exec_sig (_to :  address) 
-                             (_value :  uint256) (l : LedgerLRecord rec) :
-                             {t | t = exec_state (Uinterpreter (@transfer rec def _ _ _ _  _to _value)) l}.
-  unfold transfer. unfold dynamicAssignL.  
-  repeat auto_build_P listInfinite.
-Defined.
-
-Definition transfer_exec_let (_to :  address) 
-                             (_value :  uint256) (l : LedgerLRecord rec) : LedgerLRecord rec.
-  let_term_of_2 @transfer_exec_sig (transfer_exec_sig _to _value l).
-Defined.
-
-(* Print constructor_exec_let. *)
-
-Definition transfer_exec (_to :  address) 
-                         (_value :  uint256)  (l : LedgerLRecord rec) : LedgerLRecord rec.
-  flat_term_of_2 @transfer_exec_let (transfer_exec_let _to _value l).
-Defined.
-
-Definition transfer_prf (_to :  address) 
-                         (_value :  uint256) (l : LedgerLRecord rec) :
-  transfer_exec _to _value l = 
-  exec_state (Uinterpreter (@transfer rec def _ _ _ _ _to _value)) l.
-  proof_of_2 transfer_exec transfer_exec_sig (transfer_exec_sig _to _value l).
-Defined.
-
-(************************************************************************************************************************)
-
-Print ContractFields.
-
-Lemma constructor_set__initialAmount: forall (_initialAmount :  uint256) 
-                            (_tokenName :  string) 
-                            (_decimalUnits :  uint8) 
-                            (_tokenSymbol :  string)
-                            (vmstate: VMStateLRecord), 
-    let l0 := {$$ default with Ledger_VMState := vmstate $$} in
-    let l' := exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) l0 in
-    _totalSupply (l'.(Ledger_MainState)) = _initialAmount.
-Proof.
-    intros. subst l'.
-    rewrite <- constructor_prf.
-    auto.
-Qed.
-
-Lemma constructor_set__tokenName: forall (_initialAmount :  uint256) 
-                            (_tokenName :  string) 
-                            (_decimalUnits :  uint8) 
-                            (_tokenSymbol :  string)
-                            (vmstate: VMStateLRecord), 
-    let l0 := {$$ default with Ledger_VMState := vmstate $$} in                            
-    let l' := exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) l0 in
-    _name (l'.(Ledger_MainState)) = _tokenName.
-Proof.
-    intros. subst l'.
-    rewrite <- constructor_prf.
-    auto.
-Qed.
-
-Lemma constructor_set__decimalUnits: forall (_initialAmount :  uint256) 
-                            (_tokenName :  string) 
-                            (_decimalUnits :  uint8) 
-                            (_tokenSymbol :  string)
-                            (vmstate: VMStateLRecord), 
-    let l0 := {$$ default with Ledger_VMState := vmstate $$} in                                
-    let l' := exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) l0 in
-    _decimals (l'.(Ledger_MainState)) = _decimalUnits.
-Proof.
-    intros. subst l'.
-    rewrite <- constructor_prf.
-    auto.
-Qed.
-
-Lemma constructor_set__tokenSymbol: forall (_initialAmount :  uint256) 
-                            (_tokenName :  string) 
-                            (_decimalUnits :  uint8) 
-                            (_tokenSymbol :  string)
-                            (vmstate: VMStateLRecord), 
-    let l0 := {$$ default with Ledger_VMState := vmstate $$} in 
-    let l' := exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) l0 in
-    _symbol (l'.(Ledger_MainState)) = _tokenSymbol.
-Proof.
-    intros. subst l'.
-    rewrite <- constructor_prf.
-    auto.
-Qed.
-
-Print VMStateFields.
-#[local]
-Existing Instance BoolEq.pair_eqb_spec.
-Require Import FinProof.Lib.HMapList.
-
-Lemma constructor_set_sender_balance: forall (_initialAmount :  uint256) 
-                            (_tokenName :  string) 
-                            (_decimalUnits :  uint8) 
-                            (_tokenSymbol :  string)
-                            (l: LedgerLRecord rec),
-                            (* (vmstate: VMStateLRecord),  *)
-    let l0 := {$$ l with Ledger_LocalState := default $$} in
-    let l' := exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) l0 in
-    let msg_sender := VMState_ι_msg_sender (l.(Ledger_VMState)) in
-    (_balances (l'.(Ledger_MainState))) [msg_sender] = _initialAmount.
-Proof.
-    intros. subst l'.
-    rewrite <- constructor_prf.
-
-    destruct l. repeat destruct p.
-    destruct v. repeat destruct p.
-    destruct c. repeat destruct p.
-
-    Opaque Common.hmapFindWithDefault
-           CommonInstances.addAdjustListPair.
-
-    compute.
-
-    Transparent Common.hmapFindWithDefault
-                CommonInstances.addAdjustListPair.
-
-    rewrite lookup_some_find with (v:=_initialAmount).
-    reflexivity.
-    
-    unshelve eapply lookup_addAdjust.
-    refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)).
-Qed.
-
-(************************************************************)
 
 Lemma transfer_set_sender_balance: forall (_to :  address) 
                             (_value : uint256)
