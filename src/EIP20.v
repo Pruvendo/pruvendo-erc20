@@ -85,6 +85,8 @@ return.
 Defined.
 Sync.
 
+(* About balance. *)
+
 #[override, public, view,  returns = balance]
 Ursus Definition balanceOf (_owner :  address): UExpression uint256 false .
 {

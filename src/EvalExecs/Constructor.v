@@ -51,7 +51,7 @@ Definition constructor_exec_sig (_initialAmount :  uint256)
                                 (_tokenSymbol :  string) (l : LedgerLRecord rec) :
                                 {t | t = exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) l}.
   unfold constructor. unfold dynamicAssignL.
-  unfold totalSupply_left, balances_left, name_left, symbol_left, decimals_left.
+  (* unfold totalSupply_left, balances_left, name_left, symbol_left, decimals_left. *)
   repeat auto_build_P listInfinite.
 Defined.
 

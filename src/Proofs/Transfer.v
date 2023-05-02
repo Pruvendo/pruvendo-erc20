@@ -49,6 +49,9 @@ Definition tvm_pubkey_right (rec: Type) (def: XDefault rec) := tvm_pubkey.
 Definition _now_right (rec: Type) (def: XDefault rec) := \\ now \\.
  *)
 
+Opaque Common.hmapFindWithDefault
+        CommonInstances.addAdjustListPair
+        N.add N.sub N.leb N.ltb N.eqb Z.eqb.
 
 Lemma transfer_set_sender_balance: forall (_to :  address) 
                             (_value : uint256)
@@ -67,11 +70,7 @@ Proof.
     rewrite <- transfer_prf.
     destruct l. repeat destruct p.   
     destruct v. repeat destruct p.
-    destruct c. repeat destruct p.
-
-    Opaque Common.hmapFindWithDefault
-           CommonInstances.addAdjustListPair
-           N.add N.sub N.leb N.ltb N.eqb Z.eqb.    
+    destruct c. repeat destruct p.  
 
     compute.    
 
@@ -83,74 +82,18 @@ Proof.
     | |- context [if ?b then false else true] => remember b
     end.    
     
-    case_eq b; intros.
+    case_eq b; intros; auto.
 
-    match goal with
-    | |- context [@Common.hmapFindWithDefault ?XBool ?XInteger
-                                             ?XList ?XMaybe ?XProd 
-                                             ?XHMap ?H0 ?H1 ?H4 ?H6
-                                             ?K ?V ?v a _ _ ] => 
-                                             remember (@Common.hmapFindWithDefault XBool XInteger
-                                             XList XMaybe XProd 
-                                             XHMap H0 H1 H4 H6
-                                             K V v a) as find_a
-
-    end.
-
-    match goal with
-    | |- context [@addAdjustListPair ?K ?V ?H a _ _ ] => 
-                 remember (@addAdjustListPair K V H a) as adj_a
-    end.
-
-    match goal with
-    | |- context [@addAdjustListPair ?K ?V ?H ?k _ _ ] => 
-                 remember k as k1
-
-    end.
-
-    Transparent Common.hmapFindWithDefault
-            CommonInstances.addAdjustListPair
-            N.eqb
-            Z.eqb.
-
-    compute in Heqk1.
-    subst k1.
-
-    rewrite Heqfind_a.
     erewrite lookup_some_find.
     reflexivity.
-
     unshelve erewrite lookup_addAdjust_another.
     refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)).
-
-    rewrite Heqadj_a.
     unshelve erewrite lookup_addAdjust.
     refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)).
 
-    match goal with
-    | |- context [if ?b then _ else _] => remember b
-    end.
-
-    assert (b = b0).
-    rewrite Heqb, Heqb0, Heqfind_a.
     auto.
-
-    rewrite Heqx16, Heqfind_a. 
-    rewrite <- H1, H0.
-    auto.
-
     assumption.
 
-    match goal with
-    | |- context [if ?b then _ else _] => remember b
-    end.
-
-    assert (b = b0).
-    rewrite Heqb, Heqb0.
-    auto.
-
-    rewrite <- H1, H0.
-    auto.
 Qed.
 
 Lemma transfer_set_recepient_balance: forall (_to :  address) 
@@ -173,10 +116,6 @@ Proof.
     destruct v. repeat destruct p.
     destruct c. repeat destruct p.
 
-    Opaque Common.hmapFindWithDefault
-           CommonInstances.addAdjustListPair
-           N.add N.sub N.leb N.ltb N.eqb Z.eqb.    
-
     compute.
 
     match goal with
@@ -187,17 +126,7 @@ Proof.
     | |- context [if ?b then false else true] => remember b
     end.    
     
-    case_eq b; intros.
-
-    match goal with
-    | |- context [@addAdjustListPair ?K ?V ?H ?a ?v ?m] => remember a
-    end.
-
-    vm_compute in Heqp. rewrite Heqp.
-
-    match goal with
-    | |- context [@addAdjustListPair ?K ?V ?H _to ?v ?m] => remember v
-    end.
+    case_eq b; intros; auto.
 
     erewrite lookup_some_find.
     reflexivity.    
@@ -205,76 +134,31 @@ Proof.
     unshelve erewrite lookup_addAdjust.
     refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)).
 
-    match goal with
-    | |- context [if ?b then _ else _] => remember b
-    end.
-
-    assert (b = b0).
-    rewrite Heqb, Heqb0.
-    auto.
-
-    rewrite <- H1, H0.
-    rewrite Heqx16.
-    rewrite Heql3.
+    subst l3.
 
     remember (x10 [_to] ?).
     destruct y.
 
-    erewrite lookup_some_find. 
-    all: cycle 1.
-    
+    - 
+    erewrite lookup_some_find.
+    reflexivity. 
+    unshelve erewrite lookup_addAdjust_another.
+    refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)).
+    erewrite lookup_some_find.
+    setoid_rewrite <- Heqy.    
+    reflexivity. 
+    setoid_rewrite <- Heqy.
+    reflexivity.
+    assumption. 
+
+    -
+    rewrite lookup_none_find.
+    rewrite lookup_none_find.
+    reflexivity.
+    setoid_rewrite Heqy. reflexivity.
+
     unshelve erewrite lookup_addAdjust_another.
     refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)).
     setoid_rewrite <- Heqy. reflexivity. 
     assumption.
-
-    rewrite lookup_none_find.
-
-    match goal with
-    | |- context [@Common.hmapFindWithDefault ?XBool ?XInteger
-                                             ?XList ?XMaybe ?XProd 
-                                             ?XHMap ?H0 ?H1 ?H4 ?H6
-                                             ?K ?V ?v _to ?m ?H7 ] => 
-                                             remember (@Common.hmapFindWithDefault XBool XInteger
-                                             XList XMaybe XProd 
-                                             XHMap H0 H1 H4 H6
-                                             K V v _to m H7) as find_to
-
-    end.
-
-    rewrite lookup_none_find in Heqfind_to.
-    subst find_to. auto. setoid_rewrite <- Heqy. auto.
-
-    unshelve erewrite lookup_addAdjust_another.
-    refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)). 
-    setoid_rewrite <- Heqy. auto.
-    assumption.
-
-    match goal with
-    | |- context [if ?b then _ else _] => remember b
-    end.
-
-    assert (b = b0).
-    rewrite Heqb, Heqb0.
-    auto.
-
-    rewrite <- H1, H0. auto.
-
-    match goal with
-    | |- context [@Common.hmapFindWithDefault ?XBool ?XInteger
-                                             ?XList ?XMaybe ?XProd 
-                                             ?XHMap ?H0 ?H1 ?H4 ?H6
-                                             ?K ?V ?v _to ?m ?H7 ] => 
-                                             remember (@Common.hmapFindWithDefault XBool XInteger
-                                             XList XMaybe XProd 
-                                             XHMap H0 H1 H4 H6
-                                             K V v _to m H7) as find_to
-
-    end.
-
-    erewrite lookup_some_find in Heqfind_to.
-    all: cycle 1. setoid_rewrite <- Heqy.
-    reflexivity.
-    subst find_to.
-    auto. 
 Qed.
