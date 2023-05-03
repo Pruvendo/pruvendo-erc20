@@ -80,13 +80,3 @@ Definition constructor_prf (_initialAmount :  uint256)
   proof_of_2 constructor_exec constructor_exec_sig (constructor_exec_sig _initialAmount _tokenName _decimalUnits _tokenSymbol l).
 Defined.
 
-
-Print constructor_exec.
-
-
-Definition transfer_exec_sig (_to :  address) 
-                             (_value :  uint256) (l : LedgerLRecord rec) :
-                             {t | t = exec_state (Uinterpreter (@transfer rec def _ _ _ _  _to _value)) l}.
-  unfold transfer. unfold dynamicAssignL.  
-  repeat auto_build_P listInfinite.
-Defined.

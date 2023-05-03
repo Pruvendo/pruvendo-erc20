@@ -119,4 +119,5 @@ Sync.
 EndContract Implements EIP20Interface.
 End EIP20.
 
+GenerateLocalState 0 EIP20.
 GenerateLocalState EIP20.

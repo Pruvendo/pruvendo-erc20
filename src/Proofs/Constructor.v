@@ -50,6 +50,8 @@ Definition tvm_pubkey_right (rec: Type) (def: XDefault rec) := tvm_pubkey.
 Definition _now_right (rec: Type) (def: XDefault rec) := \\ now \\.
  *)
 
+Opaque Common.hmapFindWithDefault
+           CommonInstances.addAdjustListPair.
 
 Lemma constructor_set__initialAmount: forall (_initialAmount :  uint256) 
                             (_tokenName :  string) 
@@ -108,7 +110,6 @@ Proof.
 Qed.
 
 
-
 Lemma constructor_set_sender_balance: forall (_initialAmount :  uint256) 
                             (_tokenName :  string) 
                             (_decimalUnits :  uint8) 
@@ -125,15 +126,9 @@ Proof.
 
     destruct l. repeat destruct p.
     destruct v. repeat destruct p.
-    destruct c. repeat destruct p.
-
-    Opaque Common.hmapFindWithDefault
-           CommonInstances.addAdjustListPair.
+    destruct c. repeat destruct p. 
 
     compute.
-
-    Transparent Common.hmapFindWithDefault
-                CommonInstances.addAdjustListPair.
 
     rewrite lookup_some_find with (v:=_initialAmount).
     reflexivity.
