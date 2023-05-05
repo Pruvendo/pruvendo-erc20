@@ -243,7 +243,7 @@ against the implementation.
 | CTL.1 | name{transfer} = name &and; symbol{transfer} = symbol &and; decimals{transfer} = decimals &and; totalSupply{transfer} = totalSupply &and; name{transferFrom} = name &and; symbol{transferFrom} = symbol &and; decimals{transferFrom} = decimals &and; totalSupply{transferFrom} = totalSupply |
 | ~~CTL.2~~ | ~~Duplicate of CTT.3. Removed~~ |
 | STL.1 | balances{constructor}.size = 1 &and; balances{constructor(n, s, d, t)}[msg.sender] = t &and; allowed{constructor} = [] |
-| STL.2 | $\sum_{b \in balances}b.map(value) = totalSupply$ |
+| STL.2 | $`\sum_{b \in balances}b.map(value) = totalSupply`$ |
 | ~~STL.3~~ | ~~Achieved automatically due to hashmap usage. Removed~~ |
 | STL.4 | ok(transfer(to, a)) &harr; balances[msg.sender] &ge; a |
 | STL.5 | ok(transfer(to, a)) &rarr; &exist; w<sub>0</sub> : EIP{transfer} = EIP[balances = w<sub>0</sub>] |
