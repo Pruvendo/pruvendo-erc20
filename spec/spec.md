@@ -120,7 +120,7 @@ whole system.
 | CTL.1 | transfer( \_ )\.token = token &and; transferFrom( \_ )\.token = token | Token is not changeable after the construction |
 | CTL.2 | c(n, s, d, t).token = Token.c(n, s, d, t) | _token_ of the _Ledger_ is initialized by the corresponding constructor parameteres |
 | STL.1 | c( \_, t )\.wallets.size = 1 &and; ( &exist; w: w &in; c( \_, t )\.wallets &and; w.user = actor(c) &and; w.balance = t &and; w.allowances = [] ) | As a result of construction there is a single wallet owned by the initializing actor, having the whole amount of tokens and no allowance |
-| STL.2 | $\sum_{w \in wallets}w.map(balance) = total$ | The sum of all the balances always equals to _total_ |
+| STL.2 | $`\sum_{w \in wallets}w.map(balance) = total `$ | The sum of all the balances always equals to _total_ |
 | STL.3 | w<sub>1</sub>, w<sub>2</sub> &in; wallets &rarr; w<sub>1</sub>.user = w<sub>2</sub>.user &rarr; w<sub>1</sub> = w<sub>2</sub> | Only one wallet per user is allowed |
 | STL.4 | ok(transfer(to, a)) &harr; (&exist; w: w &in; wallets &and; w.user = actor(transfer(to, a)) &and; w.balance &ge; a) | _transfer_ is possible when and only when the sending wallet (determined by the sending actor) exists and has a balance excceding the required amount |
 | STL.5 | ok(transfer( _ )) &rarr; &exist; w<sub>0</sub>: l.transfer( _ ) = l [wallets = w<sub>0</sub>] | As a result of _transfer_ only _wallets_ are modified |
