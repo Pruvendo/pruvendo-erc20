@@ -70,10 +70,24 @@ Proof.
     rewrite <- transfer_prf.
     destruct l. repeat destruct p.   
     destruct v. repeat destruct p.
-    destruct c. repeat destruct p.  
+    destruct c. repeat destruct p. 
+    
+    compute in msg_sender_balance0, msg_sender.
+    compute. 
+ 
+    assert (forall n (v1 v: XUBInteger n) (T11 T12: _ -> Type) T2 f w w1, 
+    ((let 'Build_XUBInteger a as a'' := v
+    return T11 a'' -> T2 in
+    fun _: T11 a'' => (let 'Build_XUBInteger b as b'' := v1
+    return T12 b''-> T2 in fun _ : T12 b'' => f b a) w) w1) = 
+    f (uint2N v1) (uint2N v)).
 
-    compute.    
+    intros.
 
+    destruct v, v1. auto.
+    rewrite ?H0.
+
+    
     match goal with
     | |- context [@addAdjustListPair _ _ _ a ?v _] => remember v
     end.
