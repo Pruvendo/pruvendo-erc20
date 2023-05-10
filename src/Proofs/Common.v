@@ -94,34 +94,26 @@ Proof.
   destruct v, v1. auto.
 Qed.  
 
-(*     assert (forall n (v1 v: XUBInteger n) (T11 T12: _ -> Type) T2 f w w1, 
-    ((let 'Build_XUBInteger a as a'' := v
-    return T11 a'' -> T2 in
-    fun _: T11 a'' => (let 'Build_XUBInteger b as b'' := v1
-    return T12 b''-> T2 in fun _ : T12 b'' => f b a) w) w1) = 
-    f (uint2N v1) (uint2N v)).
+Lemma buint1 : forall n (v: XUBInteger n) (T11: _ -> Type) T2 f w, 
+(let 'Build_XUBInteger a as a'' := v
+return T11 a'' -> T2 in
+fun _: T11 a'' => f a) w = 
+f (uint2N v).
+Proof.
+intros.
 
-    intros.
+destruct v. auto.
+Qed.
 
-    destruct v, v1. auto.
-    rewrite ?H.
+Lemma buint0 : forall X n (v: XUBInteger n) (f : _ -> X), 
+match v with 
+ | Build_XUBInteger x => f x
+ end = f (uint2N v) .
+Proof.
+intros.
 
+destruct v. auto.
+Qed.
 
-    assert (forall n (v: XUBInteger n) (T11: _ -> Type) T2 f w, 
-    (let 'Build_XUBInteger a as a'' := v
-    return T11 a'' -> T2 in
-    fun _: T11 a'' => f a) w = 
-    f (uint2N v)).
-
-    intros.
-
-    destruct v. auto.
-    rewrite ?H0.
-
-
-    assert (forall X n (v: XUBInteger n) (f : _ -> X), 
-     match v with 
-      | Build_XUBInteger x => f x
-      end = f (uint2N v) ).
-
-    intros. *)
+Tactic Notation "buint_all" := (repeat  (rewrite buint2 || rewrite buint1 ||
+             rewrite buint0)).
