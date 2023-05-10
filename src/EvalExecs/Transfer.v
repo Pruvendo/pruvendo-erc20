@@ -30,19 +30,6 @@ Elpi Accumulate rec_def lp:{{
   get_def {{ def }}.
 }}.
 
-(* Definition msg_pubkey_right (rec: Type) (def: XDefault rec) := msg_pubkey.
-
-Check  msg_sender.
-
-Definition msg_sender_right (rec: Type) (def: XDefault rec) := msg_sender.
-Check  msg_sender_right.
-
-
-Definition msg_value_right (rec: Type) (def: XDefault rec) := msg_value.
-Definition tvm_pubkey_right (rec: Type) (def: XDefault rec) := tvm_pubkey.
-Definition _now_right (rec: Type) (def: XDefault rec) := \\ now \\.
- *)
-
 Definition transfer_exec_sig (_to :  address) 
                              (_value :  uint256) (l : LedgerLRecord rec) :
                              {t | t = exec_state (Uinterpreter (@transfer rec def _ _ _ _  _to _value)) l}.
@@ -62,9 +49,40 @@ Definition transfer_exec (_to :  address)
   flat_term_of_2 @transfer_exec_let (transfer_exec_let _to _value l).
 Defined.
 
-Definition transfer_prf (_to :  address) 
+Definition transfer_exec_prf (_to :  address) 
                          (_value :  uint256) (l : LedgerLRecord rec) :
   transfer_exec _to _value l = 
   exec_state (Uinterpreter (@transfer rec def _ _ _ _ _to _value)) l.
   proof_of_2 transfer_exec transfer_exec_sig (transfer_exec_sig _to _value l).
+Defined.
+
+
+
+Definition transfer_eval_sig (_to :  address) 
+                             (_value :  uint256) (l : LedgerLRecord rec) :
+                             {t | t = eval_state (Uinterpreter (@transfer rec def _ _ _ _  _to _value)) l}.
+  unfold transfer. unfold dynamicAssignL.
+  unfold fromUReturnExpression.  
+  repeat auto_build_P listInfinite.
+Defined.
+
+Definition transfer_eval_let (_to :  address) 
+                             (_value :  uint256) (l : LedgerLRecord rec) : ControlResult bool true.
+  let_term_of_2 @transfer_eval_sig (transfer_eval_sig _to _value l).
+Defined.
+
+(* Print constructor_exec_let. *)
+
+Definition transfer_eval (_to :  address) 
+                         (_value :  uint256)  (l : LedgerLRecord rec) : ControlResult bool true.
+  flat_term_of_2 @transfer_eval_let (transfer_eval_let _to _value l).
+Defined.
+
+Print transfer_eval.
+
+Definition transfer_eval_prf (_to :  address) 
+                         (_value :  uint256) (l : LedgerLRecord rec) :
+  transfer_eval _to _value l = 
+  eval_state (Uinterpreter (@transfer rec def _ _ _ _ _to _value)) l.
+  proof_of_2 transfer_eval transfer_eval_sig (transfer_eval_sig _to _value l).
 Defined.

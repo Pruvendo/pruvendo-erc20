@@ -59,11 +59,58 @@ Defined.
 
 (* Print constructor_exec_let. *)
 
+Lemma exec_if_transit: forall X (b: bool) (f: LedgerT X) (x y: LedgerLRecord rec), 
+  exec_state f (if b then x else y) = if b then exec_state f x else exec_state f y.
+Proof.
+  intros.
+  destruct b; auto.
+Qed.
+
+Lemma exec_if_transit2: forall X (b: bool) (f: LedgerT X) (x y: LedgerLRecord rec), 
+  exec_state f (xBoolIfElse b x y) = if b then exec_state f x else exec_state f y.
+Proof.
+  intros.
+  destruct b; auto.
+Qed.
+
+Lemma eval_if_transit: forall X (b: bool) (f: LedgerT X) (x y: LedgerLRecord rec), 
+  eval_state f (if b then x else y) = if b then eval_state f x else eval_state f y.
+Proof.
+  intros.
+  destruct b; auto.
+Qed.
+
+Lemma eval_if_transit2: forall X (b: bool) (f: LedgerT X) (x y: LedgerLRecord rec), 
+  eval_state f (xBoolIfElse b x y) = if b then eval_state f x else eval_state f y.
+Proof.
+  intros.
+  destruct b; auto.
+Qed.
+
 Definition transferFrom_exec (_from :  address)
                          (_to :  address) 
                          (_value :  uint256)  (l : LedgerLRecord rec) : LedgerLRecord rec.
   flat_term_of_2 @transferFrom_exec_let (transferFrom_exec_let _from _to _value l).
 Defined.
+
+(* Print transferFrom_exec. *)
+
+(* Definition transferFrom_exec2 (_from :  address)
+                         (_to :  address) 
+                         (_value :  uint256)  (l : LedgerLRecord rec) : LedgerLRecord rec.
+remember (transferFrom_exec _from _to _value l).
+unfold transferFrom_exec in Heql0.
+(* symmetry in Heql0. *)
+repeat rewrite exec_if_transit, exec_if_transit2 in Heql0.
+match goal with 
+| Heql0: l0 = ?l |- _ => exact l
+end.
+Defined. *)
+
+
+(* Print transferFrom_exec2. *)
+
+
 
 Definition transferFrom_prf (_from :  address)
                          (_to :  address) 
@@ -72,3 +119,6 @@ Definition transferFrom_prf (_from :  address)
   exec_state (Uinterpreter (@transferFrom rec def _ _ _ _ _from _to _value)) l.
   proof_of_2 transferFrom_exec transferFrom_exec_sig (transferFrom_exec_sig _from _to _value l).
 Defined.
+
+
+(* Print transferFrom_exec. *)

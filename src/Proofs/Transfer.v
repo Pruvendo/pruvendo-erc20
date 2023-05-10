@@ -36,22 +36,174 @@ Elpi Accumulate rec_def lp:{{
   get_def {{ def }}.
 }}.
 
-(* Definition msg_pubkey_right (rec: Type) (def: XDefault rec) := msg_pubkey.
-
-Check  msg_sender.
-
-Definition msg_sender_right (rec: Type) (def: XDefault rec) := msg_sender.
-Check  msg_sender_right.
-
-
-Definition msg_value_right (rec: Type) (def: XDefault rec) := msg_value.
-Definition tvm_pubkey_right (rec: Type) (def: XDefault rec) := tvm_pubkey.
-Definition _now_right (rec: Type) (def: XDefault rec) := \\ now \\.
- *)
+(* *********************************************************************************************** *)
 
 Opaque Common.hmapFindWithDefault
         CommonInstances.addAdjustListPair
         N.add N.sub N.leb N.ltb N.eqb Z.eqb.
+
+Lemma transfer_set_recepient_balance0: forall (_to :  address) 
+                            (_value : uint256)
+                            (l: LedgerLRecord rec), 
+    let l0 := {$$ l with Ledger_LocalState := default $$} in
+    let l' := exec_state (Uinterpreter (@transfer rec def _ _ _ _ _to _value)) l0 in
+    let msg_sender := VMState_ι_msg_sender (l.(Ledger_VMState)) in
+    (* let msg_sender_balance0 := (_balances (l.(Ledger_MainState))) [msg_sender] in *)
+    let recepient_balance0 := (_balances (l.(Ledger_MainState))) [_to] in
+    _to = msg_sender -> 
+    (_balances (l'.(Ledger_MainState))) [_to] = recepient_balance0.        
+Proof.        
+    intros. subst l'.
+    rewrite <- transfer_exec_prf.
+    destruct l. repeat destruct p.   
+    destruct v. repeat destruct p.
+    destruct c. repeat destruct p.
+
+    compute.
+    compute in msg_sender, recepient_balance0.
+
+    assert (forall n (v1 v: XUBInteger n) (T11 T12: _ -> Type) T2 f w w1, 
+    ((let 'Build_XUBInteger a as a'' := v
+    return T11 a'' -> T2 in
+    fun _: T11 a'' => (let 'Build_XUBInteger b as b'' := v1
+    return T12 b''-> T2 in fun _ : T12 b'' => f b a) w) w1) = 
+    f (uint2N v1) (uint2N v)) as HH.
+
+    intros.
+
+    destruct v, v1. auto.
+    rewrite ?HH.
+
+    match goal with
+    | |- context [if ?b then false else true] => remember b
+    end.    
+    
+    case_eq b; intros; auto.
+
+    subst msg_sender.
+    rewrite <- H.
+    rewrite <- H in Heqb.
+
+    erewrite lookup_some_find.
+    reflexivity.    
+    unshelve erewrite lookup_addAdjust.
+    refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)).
+
+    erewrite lookup_some_find.
+    
+    2: unshelve erewrite lookup_addAdjust.
+    2: refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)).
+    2: reflexivity. 
+
+    match goal with 
+    | |- context [@Common.hmapFindWithDefault ?B ?I ?L ?M ?P ?HM ?H0 ?H1 ?H4 ?H6 ?K ?V ?v ?k ?m ?H7] =>
+        remember (@Common.hmapFindWithDefault B I L M P HM H0 H1 H4 H6 K V v k m H7)
+    end.
+
+    destruct _value, x16.
+    simpl. simpl in Heqb.
+
+    rewrite H0 in Heqb.
+    symmetry in Heqb.    
+    apply N.leb_le in Heqb.
+
+    do 2 f_equal.
+    lia.    
+Qed.    
+
+Lemma exec_if_transit: forall X (b: bool) (f: LedgerT X) (x y: LedgerLRecord rec), 
+  exec_state f (if b then x else y) = if b then exec_state f x else exec_state f y.
+Proof.
+  intros.
+  destruct b; auto.
+Qed.
+
+Lemma exec_if_transit2: forall X (b: bool) (f: LedgerT X) (x y: LedgerLRecord rec), 
+  exec_state f (xBoolIfElse b x y) = if b then exec_state f x else exec_state f y.
+Proof.
+  intros.
+  destruct b; auto.
+Qed.
+
+Lemma eval_if_transit: forall X (b: bool) (f: LedgerT X) (x y: LedgerLRecord rec), 
+  eval_state f (if b then x else y) = if b then eval_state f x else eval_state f y.
+Proof.
+  intros.
+  destruct b; auto.
+Qed.
+
+Lemma eval_if_transit2: forall X (b: bool) (f: LedgerT X) (x y: LedgerLRecord rec), 
+  eval_state f (xBoolIfElse b x y) = if b then eval_state f x else eval_state f y.
+Proof.
+  intros.
+  destruct b; auto.
+Qed.
+
+
+Lemma toValue_if_transit: forall X (b: bool) (x y: ControlResult X false), 
+  toValue (if b then x else y) = if b then toValue x else toValue y.
+Proof.
+  intros.
+  destruct b; auto.
+Qed.
+
+Lemma toValue_if_transit2: forall X (b: bool) (x y: ControlResult X false), 
+  toValue (xBoolIfElse b x y) = if b then toValue x else toValue y.
+Proof.
+  intros.
+  destruct b; auto.
+Qed.
+
+
+
+
+Lemma transfer_success: forall (_to :  address) 
+                            (_value : uint256)
+                            (l: LedgerLRecord rec), 
+    let l0 := {$$ l with Ledger_LocalState := default $$} in
+    let r := eval_state (Uinterpreter (@transfer rec def _ _ _ _ _to _value)) l0 in
+    let msg_sender := VMState_ι_msg_sender (l.(Ledger_VMState)) in
+    let msg_sender_balance0 := (_balances (l.(Ledger_MainState))) [msg_sender] in
+    r = if (xIntGeb msg_sender_balance0  _value : bool) then 
+        ControlValue true true
+        else ControlError ERROR_DEFAULT. 
+Proof.
+
+    intros. subst r.
+    rewrite <- transfer_eval_prf.
+    destruct l. repeat destruct p.   
+    destruct v. repeat destruct p.
+    destruct c. repeat destruct p.
+
+    Print transfer_eval.
+
+    unfold transfer_eval.    
+    repeat  (rewrite exec_if_transit || rewrite exec_if_transit2 ||
+             rewrite eval_if_transit || rewrite eval_if_transit2 ||
+             rewrite toValue_if_transit || rewrite  toValue_if_transit2).
+        
+    compute. 
+    compute in msg_sender, msg_sender_balance0.
+
+    assert (forall n (v1 v: XUBInteger n) (T11 T12: _ -> Type) T2 f w w1, 
+    ((let 'Build_XUBInteger a as a'' := v
+    return T11 a'' -> T2 in
+    fun _: T11 a'' => (let 'Build_XUBInteger b as b'' := v1
+    return T12 b''-> T2 in fun _ : T12 b'' => f b a) w) w1) = 
+    f (uint2N v1) (uint2N v)) as HH.
+
+    intros.
+
+    destruct v, v1. auto.
+    rewrite ?HH.
+
+    match goal with
+    | |- context [if ?b then _ else _] => remember b
+    end.  
+
+    case_eq b; intros; auto.
+Qed.
+
 
 Lemma transfer_set_sender_balance: forall (_to :  address) 
                             (_value : uint256)
