@@ -65,7 +65,7 @@ Defined.
 
 Definition transferFrom_eval_prf (_from :  address) (_to :  address) 
                          (_value :  uint256) (l : LedgerLRecord rec) :
-  transferFrom_eval _to _value l = 
+  transferFrom_eval _from _to _value l = 
   eval_state (Uinterpreter (@transferFrom rec def _ _ _ _ _from _to _value)) l.
   proof_of_2 transferFrom_eval transferFrom_eval_sig (transferFrom_eval_sig _from _to _value l).
 Defined.
