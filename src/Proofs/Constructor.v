@@ -53,6 +53,46 @@ Proof.
   auto.
 Defined.
 
+Tactic Notation "constructor_start"  constr(l) constr(l0) constr(l')  :=
+    (subst l'; subst l0;
+     rewrite <- constructor_computed_prf;
+    
+    destruct l as [c p]; destruct p as [c0 p];
+    destruct p as [m p]; destruct p as [m0 p];
+    destruct p as [v p]; destruct p as [l l0];
+
+    destruct v as [v0 p]; destruct p as [v1 p]; 
+    destruct p as [v2 p]; destruct p as [v3 p]; 
+    destruct p as [v4 p]; destruct p as [v5 p]; 
+    destruct p as [v6 p]; destruct p as [v7 p]; 
+    destruct p as [v8 p]; destruct p as [v9 p]; 
+    destruct p as [v10 p]; destruct p as [v11 p]; 
+    destruct p as [v12 p]; destruct p as [v13 p]; 
+    destruct p as [v14 p]; destruct p as [v15 v16]; 
+    
+    destruct c as [s0 p]; destruct p as [s1 p];
+    destruct p as [s2 p]; destruct p as [s3 p];
+    destruct p as [s4 s5];  
+
+    unfold constructor_exec_computed;
+    simpl proj1_sig;
+    unfold LedgerLGetField;
+    unfold ContractLGetField;
+    simpl fold_apply;
+    unfold ClassGeneratorsCommon.CountableMoreAll_obligation_3;
+    unfold LedgerFields_rect;
+    unfold ContractFields_rect).
+
+Tactic Notation "compute_rhs" := 
+(match goal with 
+    | |- _ = ?rhs =>    let RHS := fresh "rhs" in
+                        let H := fresh "Heqrhs" in   
+                        remember rhs as RHS eqn: H;
+                        compute in H;
+                        buint_all in H;
+                        subst RHS
+    end).
+
 
 Lemma constructor_msg_sender_unchanged: forall (_initialAmount :  uint256) 
                             (_tokenName :  string) 
@@ -64,21 +104,7 @@ Lemma constructor_msg_sender_unchanged: forall (_initialAmount :  uint256)
     let msg_sender := VMState_ι_msg_sender (l.(Ledger_VMState)) in
     VMState_ι_msg_sender (l'.(Ledger_VMState)) = msg_sender.
 Proof.
-    intros. subst l'. subst l0.
-    rewrite <- constructor_computed_prf.
-    
-    destruct l. repeat destruct p.   
-    destruct v. repeat destruct p.
-    destruct c. repeat destruct p.  
-
-    unfold constructor_exec_computed.
-    simpl proj1_sig.
-    unfold LedgerLGetField.
-    unfold ContractLGetField.
-    simpl fold_apply.
-    unfold ClassGeneratorsCommon.CountableMoreAll_obligation_3.
-    unfold LedgerFields_rect.
-    unfold ContractFields_rect.
+    intros. constructor_start l l0 l'.
     auto.
 Qed.
 
@@ -93,21 +119,7 @@ Lemma constructor_set__initialAmount: forall (_initialAmount :  uint256)
     let l' := exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) l0 in                               
     _totalSupply (l'.(Ledger_MainState)) = _initialAmount.
 Proof.
-    intros. subst l'. subst l0.
-    rewrite <- constructor_computed_prf.
-    
-    destruct l. repeat destruct p.   
-    destruct v. repeat destruct p.
-    destruct c. repeat destruct p.  
-
-    unfold constructor_exec_computed.
-    simpl proj1_sig.
-    unfold LedgerLGetField.
-    unfold ContractLGetField.
-    simpl fold_apply.
-    unfold ClassGeneratorsCommon.CountableMoreAll_obligation_3.
-    unfold LedgerFields_rect.
-    unfold ContractFields_rect.
+    intros. constructor_start l l0 l'.
     auto.
 Qed.
 
@@ -120,21 +132,7 @@ Lemma constructor_set__tokenName: forall (_initialAmount :  uint256)
     let l' := exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) l0 in
     _name (l'.(Ledger_MainState)) = _tokenName.
 Proof.
-    intros. subst l'. subst l0.
-    rewrite <- constructor_computed_prf.
-    
-    destruct l. repeat destruct p.   
-    destruct v. repeat destruct p.
-    destruct c. repeat destruct p.  
-
-    unfold constructor_exec_computed.
-    simpl proj1_sig.
-    unfold LedgerLGetField.
-    unfold ContractLGetField.
-    simpl fold_apply.
-    unfold ClassGeneratorsCommon.CountableMoreAll_obligation_3.
-    unfold LedgerFields_rect.
-    unfold ContractFields_rect.
+    intros. constructor_start l l0 l'.
     auto.
 Qed.
 
@@ -147,21 +145,7 @@ Lemma constructor_set__decimalUnits: forall (_initialAmount :  uint256)
     let l' := exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) l0 in
     _decimals (l'.(Ledger_MainState)) = _decimalUnits.
 Proof.
-    intros. subst l'. subst l0.
-    rewrite <- constructor_computed_prf.
-    
-    destruct l. repeat destruct p.   
-    destruct v. repeat destruct p.
-    destruct c. repeat destruct p.  
-
-    unfold constructor_exec_computed.
-    simpl proj1_sig.
-    unfold LedgerLGetField.
-    unfold ContractLGetField.
-    simpl fold_apply.
-    unfold ClassGeneratorsCommon.CountableMoreAll_obligation_3.
-    unfold LedgerFields_rect.
-    unfold ContractFields_rect.
+    intros. constructor_start l l0 l'.
     auto.
 Qed.
 
@@ -174,21 +158,7 @@ Lemma constructor_set__tokenSymbol: forall (_initialAmount :  uint256)
     let l' := exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) l0 in
     _symbol (l'.(Ledger_MainState)) = _tokenSymbol.
 Proof.
-    intros. subst l'. subst l0.
-    rewrite <- constructor_computed_prf.
-    
-    destruct l. repeat destruct p.   
-    destruct v. repeat destruct p.
-    destruct c. repeat destruct p.  
-
-    unfold constructor_exec_computed.
-    simpl proj1_sig.
-    unfold LedgerLGetField.
-    unfold ContractLGetField.
-    simpl fold_apply.
-    unfold ClassGeneratorsCommon.CountableMoreAll_obligation_3.
-    unfold LedgerFields_rect.
-    unfold ContractFields_rect.
+    intros. constructor_start l l0 l'.
     auto.
 Qed.
 
@@ -203,21 +173,7 @@ Lemma constructor_set_sender_balance: forall (_initialAmount :  uint256)
     let msg_sender := VMState_ι_msg_sender (l.(Ledger_VMState)) in
     (_balances (l'.(Ledger_MainState))) [msg_sender] = _initialAmount.
 Proof.
-    intros. subst l'. subst l0.
-    rewrite <- constructor_computed_prf.
-    
-    destruct l. repeat destruct p.   
-    destruct v. repeat destruct p.
-    destruct c. repeat destruct p.  
-
-    unfold constructor_exec_computed.
-    simpl proj1_sig.
-    unfold LedgerLGetField.
-    unfold ContractLGetField.
-    simpl fold_apply.
-    unfold ClassGeneratorsCommon.CountableMoreAll_obligation_3.
-    unfold LedgerFields_rect.
-    unfold ContractFields_rect.
+    intros. constructor_start l l0 l'.   
 
     rewrite lookup_some_find with (v:=_initialAmount).
     reflexivity.
@@ -240,34 +196,12 @@ Lemma constructor_not_sender_balance: forall (_initialAmount :  uint256)
     a <> msg_sender ->
     (_balances (l'.(Ledger_MainState))) [a] = a_balance0.
 Proof.
-    intros. subst l'. subst l0.
-    rewrite <- constructor_computed_prf.
-    
-    destruct l. repeat destruct p.   
-    destruct v. repeat destruct p.
-    destruct c. repeat destruct p.  
+    intros. constructor_start l l0 l'.    
 
-    unfold constructor_exec_computed.
-    simpl proj1_sig.
-    unfold LedgerLGetField.
-    unfold ContractLGetField.
-    simpl fold_apply.
-    unfold ClassGeneratorsCommon.CountableMoreAll_obligation_3.
-    unfold LedgerFields_rect.
-    unfold ContractFields_rect.
-
-    match goal with 
-    | |- _ = ?rhs => let RHS := fresh "rhs" in
-                       let H := fresh "Heqrhs" in   
-                       remember rhs as RHS eqn: H;
-                       compute in H;
-                       buint_all in H;
-                       subst RHS
-    end.
-
+    compute_rhs.
     compute in a_balance0, msg_sender. 
 
-    remember (x10 [a] ?).
+    remember (s0 [a] ?).
     destruct y.
     + erewrite lookup_some_find.
     reflexivity. 
