@@ -225,3 +225,26 @@ Proof.
       setoid_rewrite <- Heqy. reflexivity. 
       tauto.
 Qed.
+
+
+Lemma constructor_allowed_unchanged: forall (_initialAmount :  uint256) 
+                            (_tokenName :  string) 
+                            (_decimalUnits :  uint8) 
+                            (_tokenSymbol :  string)
+                            (l: LedgerLRecord rec),
+    let l0 := {$$ l with Ledger_LocalState := default $$} in
+    let l' := exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) l0 in
+    let allowed0 := _allowed (l.(Ledger_MainState)) in
+     _allowed (l'.(Ledger_MainState)) = allowed0.
+Proof.
+    intros. constructor_start l l0 l'.
+    auto.
+Qed.
+
+(* Search Common.hmapFindWithDefault. *)
+
+
+(* Lemma hmap_sum_inv: forall, 
+    m1[k] > x ->
+    m2[k] = xIntMinus m1[k] x ->
+    m2[] *)
