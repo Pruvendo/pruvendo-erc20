@@ -10,7 +10,6 @@ Import EIP20.
 
 Require Import EvalExecs.Approve.
 
-
 Opaque Common.hmapFindWithDefault
         CommonInstances.addAdjustListPair
         N.add N.sub N.leb N.ltb N.eqb Z.eqb.
@@ -87,6 +86,8 @@ Tactic Notation "compute_rhs" :=
                         buint_all in H;
                         subst RHS
     end).
+
+
 
 
 Lemma approve_msg_sender_unchanged: forall (_spender :  address) (_value :  uint256)
