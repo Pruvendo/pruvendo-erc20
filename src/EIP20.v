@@ -85,7 +85,48 @@ return.
 Defined.
 Sync.
 
-(* About balance. *)
+
+#[override, public, nonpayable, returns = success]
+Ursus Definition transfer' (_to :  address) 
+                           (_value :  uint256)
+                           (b: bool): UExpression boolean true .
+{
+    :://  require_ ( b ) .    
+    :://  balances [[ msg->sender ]] -=  _value .
+    :://  balances [[ _to ]] += _value .    
+    :://  success := @true |.
+}
+return.
+Defined.
+Sync.
+
+#[override, public, nonpayable, returns = success]
+Ursus Definition transfer1 (_to :  address) 
+                          (_value :  uint256): UExpression boolean true .
+{
+    ::// success := transfer' (_to, _value, balances [[msg->sender]] >= _value) |.
+}
+return.
+Defined.
+Sync.
+
+#[override, public, nonpayable, returns = success]
+Ursus Definition transferFrom1 (_from :  address) 
+                              (_to :  address) 
+                              (_value :  uint256): UExpression boolean true.
+{
+    ::// var allowance : uint256  := allowed[[_from]][[msg->sender]] ; _ |.
+    ::// success := transfer' (_to, _value, ((balances[[_from]] >= _value) && 
+                                            ({allowance} >= _value))) .
+    ::// if ( {allowance} < MAX_UINT256 ) then 
+          {
+            allowed[[_from]][[msg->sender]] -= _value
+          } |.
+}
+return.
+Defined.
+Sync.
+
 
 #[override, public, view,  returns = balance]
 Ursus Definition balanceOf (_owner :  address): UExpression uint256 false .

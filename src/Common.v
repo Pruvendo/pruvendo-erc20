@@ -252,7 +252,30 @@ induction l; intros.
     symmetry in H6. destruct H0. apply eqb_spec_intro in H6.
     rewrite H6 in Heqy.
     discriminate.
-    Unshelve. split; assumption.   
+    Unshelve. split; assumption.
+Qed.
+
+Lemma hmapSumGE: forall {K}`{XBoolEquable bool K}`{BoolEq.eqb_spec K} (m: mapping K N) k, 
+(* keysDistinct m -> *)
+hmapSum m >= m[k].
+Proof.
+    intros.
+    destruct m.
+
+    induction l.
+    - unfold Common.hmapFindWithDefault. simpl. lia.
+    - simpl. rewrite fold_left_addable.
+      match goal with
+      | IHl: ?x >= ?y |- _ => remember x; remember y
+      end.
+      setoid_rewrite <- Heqn. 
+      unfold Common.hmapFindWithDefault. 
+      unfold hmapLookup.
+      simpl.
+      remember (eqb k (fst a)).
+      destruct y.
+      + simpl. unfold Datatypes.id. lia.
+      + setoid_rewrite <- Heqn0. lia.
 Qed.
 
 
@@ -271,6 +294,162 @@ assumption.
 apply insert_kd.
 assumption.
 Qed.
+
+Require Import FinProof.Lib.Tactics.
+
+Definition mapBN2N {K} {n} (m: mapping K (XUBInteger n)) := 
+match m with 
+    | wrap _ l => (wrap Map (List.map (fun x => let 'Build_XUBInteger n := snd x in (fst x, n)) l))
+end.
+
+Definition hmapBSum {K} {n} (m: mapping K (XUBInteger n)) := 
+    @Build_XUBInteger n of hmapSum (mapBN2N m).
+
+Lemma mapBN2N_keys: forall {K} {n} (m: mapping K (XUBInteger n)),
+    xHMapKeys m = xHMapKeys (mapBN2N m).
+Proof. 
+    intros.
+    destruct m.
+    induction l; auto.
+    simpl.
+    destruct a. destruct x. simpl.
+    setoid_rewrite IHl. auto.
+Qed.
+
+Lemma keysDistinct_ignores_values2 : forall K V1 V2  (m1: listMap K V1) 
+                                                    (m2: listMap K V2),
+  xHMapKeys m1 = xHMapKeys m2 -> keysDistinct m1 -> keysDistinct m2.
+Proof.
+  destruct m1 as [m1]. destruct m2 as [m2].
+  generalize dependent m2.
+  induction m1.
+  - intros. unfoldHMap xHMapKeys in H. unfoldHMap xHMapEmpty in H.
+    unfoldList xListMap in H. inversion H.
+    symmetry in H2. apply map_eq_nil in H2. subst. constructor.
+  - intros. unfoldHMap xHMapKeys in H. unfoldList xListMap in H.
+    simpl in H. destruct m2. discriminate.
+    simpl in H. inversion H. destruct a, p. simpl in H2. subst.
+    constructor. apply IHm1. auto. inversion H0. auto.
+    inversion H0. unfoldHMap xHMapKeys in H6. unfoldHMap xHMapKeys.
+    unfoldList xListMap. unfoldList xListMap in H6. 
+    simpl. rewrite <- H3. auto.
+Qed.
+
+
+Lemma mapBN2N_keysDistinct: forall {K} {n} (m: mapping K (XUBInteger n)),
+    keysDistinct m -> keysDistinct (mapBN2N m).
+Proof.
+    intros.
+    apply keysDistinct_ignores_values2 with (m1:=m).
+    rewrite mapBN2N_keys. auto.
+    assumption.
+Qed.
+
+(* Import ListNotations.
+Transparent addAdjustListPair. *)
+Lemma mapBN2N_addAdjust: forall K`{XBoolEquable bool K}`{BoolEq.eqb_spec K} n (m: mapping K (XUBInteger n)) k a,
+    keysDistinct m ->
+    mapBN2N (m[k]← a) = 
+    (mapBN2N m) [k] ← (uint2N a).
+Proof.
+    intros.
+    destruct m.
+    induction l.
+    - simpl. destruct a. auto.
+    - destruct a. simpl.
+    unfold addAdjustListPair.
+    simpl.
+    destruct a0.
+    destruct x. simpl.
+    remember (eqb k k0).
+    destruct y.
+    + simpl.
+    erewrite 2keysDistinct_addAdjustListPair__true.
+    auto.
+    all: cycle 1.
+    symmetry in Heqy. rewrite BoolEq.eqb_spec_intro in Heqy.
+    rewrite Heqy.
+    apply H1.
+    apply mapBN2N_keysDistinct in H1.
+    simpl in H1.
+    symmetry in Heqy. rewrite BoolEq.eqb_spec_intro in Heqy.
+    rewrite Heqy.
+    apply H1.
+    + simpl.
+    remember ((wrap Map l) [k]← (Build_XUBInteger n0)).
+    destruct y. unfold xHMapInsert in Heqy0.
+    simpl in Heqy0. unfold addAdjustListPair in Heqy0.
+    inversion Heqy0. rewrite <- H3.
+    unfold mapBN2N in IHl.
+    f_equal. f_equal.
+    About wrap.
+    match goal with
+    | |- ?x = ?y => enough (wrap Map x = wrap Map y)
+    end.
+    inversion H2. auto.
+    rewrite IHl.
+    unfold xHMapInsert. simpl.
+    unfold addAdjustListPair. simpl. auto.
+    enough (keysDistinct_list ((([ (k0, Build_XUBInteger n1)  ])%list ++ l))%list).
+    apply keysDistinct_app in H2.
+    tauto. apply H1.
+Qed.    
+
+(* Transparent Common.hmapFindWithDefault. *)
+
+Lemma mapBN2N_hmapLookup: forall K`{XBoolEquable bool K}`{BoolEq.eqb_spec K} 
+                           n (m: mapping K (XUBInteger n)) k,    
+    (mapBN2N m) [k] = uint2N (m[k]).
+Proof.
+    intros.    
+    destruct m.
+    induction l; auto.
+    simpl. destruct a. destruct x. simpl.
+    unfold Common.hmapFindWithDefault.
+    simpl. unfold hmapLookup.
+    simpl.
+    remember (eqb k k0).
+    destruct y.
+    - simpl. auto. 
+    - auto.
+Qed.    
+
+
+Lemma mapBN2N_hmapLookup2: forall K`{XBoolEquable bool K}`{BoolEq.eqb_spec K} 
+                           n (m: mapping K (XUBInteger n)) k,    
+    ((mapBN2N m) [k] ?)  = xMaybeMap uint2N (m[k]?) .
+Proof.
+    intros.    
+    destruct m.
+    induction l; auto.
+    simpl. destruct a. destruct x. simpl.
+    (* unfold Common.hmapFindWithDefault. *)
+    simpl. unfold hmapLookup.
+    simpl.
+    remember (eqb k k0).
+    destruct y.
+    - simpl. auto. 
+    - auto.
+Qed.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 Check (* FinProof.MonadTransformers21. *)TransEmbedded.    

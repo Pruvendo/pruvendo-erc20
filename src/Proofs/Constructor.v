@@ -241,10 +241,84 @@ Proof.
     auto.
 Qed.
 
-(* Search Common.hmapFindWithDefault. *)
+Lemma constructor_balances: forall (_initialAmount :  uint256) 
+                            (_tokenName :  string) 
+                            (_decimalUnits :  uint8) 
+                            (_tokenSymbol :  string)
+                            (l: LedgerLRecord rec),
+    let l0 := {$$ l with Ledger_LocalState := default $$} in
+    let l' := exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) l0 in
+    let balances0 := _balances (l.(Ledger_MainState)) in
+    let msg_sender := VMState_ι_msg_sender (l.(Ledger_VMState)) in    
+    (* keysDistinct balances0 -> *)
+     _balances (l'.(Ledger_MainState)) = balances0 [msg_sender] ← _initialAmount.
+Proof.
+    intros. constructor_start l l0 l'.        
+    
+    compute in balances0, msg_sender.
+    auto. 
+Qed.
+
+Lemma constructor_balances_keysDistinct: forall (_initialAmount :  uint256) 
+                            (_tokenName :  string) 
+                            (_decimalUnits :  uint8) 
+                            (_tokenSymbol :  string)
+                            (l: LedgerLRecord rec),
+    let l0 := {$$ l with Ledger_LocalState := default $$} in
+    let l' := exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) l0 in
+    let balances0 := _balances (l.(Ledger_MainState)) in
+    let msg_sender := VMState_ι_msg_sender (l.(Ledger_VMState)) in
+    let balances := _balances (l'.(Ledger_MainState)) in
+    keysDistinct balances0 -> 
+    keysDistinct balances.
+Proof.    
+    intros.
+    subst balances.
+    subst l'. subst l0.    
+    rewrite constructor_balances.
+    apply insert_kd.
+    assumption.
+Qed.
 
 
-(* Lemma hmap_sum_inv: forall, 
-    m1[k] > x ->
-    m2[k] = xIntMinus m1[k] x ->
-    m2[] *)
+Lemma constructor_balances_sum: forall (_initialAmount :  uint256) 
+                            (_tokenName :  string) 
+                            (_decimalUnits :  uint8) 
+                            (_tokenSymbol :  string)
+                            (l: LedgerLRecord rec),
+    let l0 := {$$ l with Ledger_LocalState := default $$} in
+    let l' := exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) l0 in
+    let balances0 := _balances (l.(Ledger_MainState)) in
+    let msg_sender := VMState_ι_msg_sender (l.(Ledger_VMState)) in
+    let balances := _balances (l'.(Ledger_MainState)) in
+    keysDistinct balances0 ->
+     hmapBSum balances = 
+        xIntMinus (xIntPlus _initialAmount (hmapBSum balances0)) (balances0 [msg_sender]).
+Proof.
+    intros.
+    subst balances.
+    subst l'. subst l0.
+    unfold hmapBSum.
+    rewrite constructor_balances.
+    (* rewrite hmapSumAdjust. *)
+    (* rewrite hmapSumEqual with (m2:=mapBN2N(balances0[msg_sender] ← _initialAmount)). *)
+    rewrite mapBN2N_addAdjust.
+    rewrite hmapSumAdjust.
+    rewrite mapBN2N_hmapLookup.
+    subst balances0.
+    remember (hmapSum (mapBN2N (_balances (Ledger_MainState l)))).
+    setoid_rewrite <- Heqn.
+    subst msg_sender.
+    remember ((_balances (Ledger_MainState l)) [VMState_ι_msg_sender (Ledger_VMState l)]).
+    setoid_rewrite <- Heqx.
+    destruct _initialAmount, x; simpl. auto.
+    
+    refine pair_xbool_equable.    
+    refine BoolEq.pair_eqb_spec.
+
+    apply mapBN2N_keysDistinct. assumption.
+    refine pair_xbool_equable.    
+    refine BoolEq.pair_eqb_spec.
+
+    assumption. 
+Qed.
