@@ -62,8 +62,8 @@ Tactic Notation "approve_start"  constr(l) constr(l0) constr(l')  :=
     destruct p as [v8 p]; destruct p as [v9 p]; 
     destruct p as [v10 p]; destruct p as [v11 p]; 
     destruct p as [v12 p]; destruct p as [v13 p]; 
-    destruct p as [v14 p]; destruct p as [v15 v16]; 
-    
+    destruct p as [v14 p]; destruct p as [v15 p]; 
+    destruct p as [v16 v17]; 
     destruct c as [s0 p]; destruct p as [s1 p];
     destruct p as [s2 p]; destruct p as [s3 p];
     destruct p as [s4 s5];  
@@ -124,7 +124,7 @@ Proof.
     subst msg_sender.
 
     
-    erewrite lookup_some_find with (k:=v4).
+    erewrite lookup_some_find with (k:=v5).
     all: cycle 1.
     unshelve eapply lookup_addAdjust.
     refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)).
@@ -171,14 +171,14 @@ Proof.
     auto. auto.
     - remember s1 [x]?.
       destruct y0.
-      + assert (x = v4 \/ x <> v4) by repeat decide equality.
+      + assert (x = v5 \/ x <> v5) by repeat decide equality.
         destruct H0.
         * subst x.   
-            erewrite lookup_some_find with (k:=v4).
+            erewrite lookup_some_find with (k:=v5).
             2: unshelve erewrite lookup_addAdjust.
             2: refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)).
             2: reflexivity.        
-            **  erewrite lookup_some_find with (k:=v4).
+            **  erewrite lookup_some_find with (k:=v5).
                 2: setoid_rewrite <- Heqy0.
                 2: reflexivity.
                 remember x0[y]?.
@@ -210,14 +210,14 @@ Proof.
             2: setoid_rewrite <- Heqy0.
             2: reflexivity.
             auto.
-      + assert (x = v4 \/ x <> v4) by repeat decide equality.
+      + assert (x = v5 \/ x <> v5) by repeat decide equality.
         destruct H0.
         * subst x.
-          erewrite lookup_some_find with (k:=v4).
+          erewrite lookup_some_find with (k:=v5).
           2: unshelve erewrite lookup_addAdjust.
           2: refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)).
           2: reflexivity.
-          erewrite lookup_none_find with (k:=v4).
+          erewrite lookup_none_find with (k:=v5).
           2: auto.
           erewrite ?lookup_none_find with (k:=y).
           auto.

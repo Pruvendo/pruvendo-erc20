@@ -63,7 +63,8 @@ Tactic Notation "transfer_start"  constr(l) constr(l0) constr(l')  :=
     destruct p as [v8 p]; destruct p as [v9 p]; 
     destruct p as [v10 p]; destruct p as [v11 p]; 
     destruct p as [v12 p]; destruct p as [v13 p]; 
-    destruct p as [v14 p]; destruct p as [v15 v16]; 
+    destruct p as [v14 p]; destruct p as [v15 p]; 
+    destruct p as [v16 v17];
     
     destruct c as [s0 p]; destruct p as [s1 p];
     destruct p as [s2 p]; destruct p as [s3 p];
@@ -160,7 +161,7 @@ Proof.
     compute in msg_sender_balance0, msg_sender.
     
     match goal with
-    | |- context [@addAdjustListPair _ _ _ v4 ?v _] => remember v
+    | |- context [@addAdjustListPair _ _ _ v5 ?v _] => remember v
     end.
 
     match goal with
@@ -199,7 +200,7 @@ Proof.
     compute in msg_sender_balance0, msg_sender, recepient_balance0.
 
     match goal with
-    | |- context [@addAdjustListPair ?K ?V ?H v4 ?v ?m] => remember (@addAdjustListPair K V H v4 v m)
+    | |- context [@addAdjustListPair ?K ?V ?H v5 ?v ?m] => remember (@addAdjustListPair K V H v5 v m)
     end.
 
     match goal with
@@ -343,7 +344,7 @@ Proof.
     end.    
     
     case_eq b; intros; auto.
-    remember (eqb _to v4).
+    remember (eqb _to v5).
     destruct y.
     - symmetry in Heqy. 
       rewrite BoolEq.eqb_spec_intro in Heqy.
@@ -394,7 +395,7 @@ Proof.
     
     case_eq b; intros; auto.
     subst msg_sender.
-    subst v4.
+    subst v5.
 
     apply member_true_lookup in H1.
     destruct H1.    
@@ -456,7 +457,7 @@ Proof.
     
     case_eq b; intros; auto.
     subst msg_sender.
-    subst v4.
+    subst v5.
 
     apply member_false_lookup in H1.    
 

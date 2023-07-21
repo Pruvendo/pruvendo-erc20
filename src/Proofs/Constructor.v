@@ -68,7 +68,8 @@ Tactic Notation "constructor_start"  constr(l) constr(l0) constr(l')  :=
     destruct p as [v8 p]; destruct p as [v9 p]; 
     destruct p as [v10 p]; destruct p as [v11 p]; 
     destruct p as [v12 p]; destruct p as [v13 p]; 
-    destruct p as [v14 p]; destruct p as [v15 v16]; 
+    destruct p as [v14 p]; destruct p as [v15 p]; 
+    destruct p as [v16 v17];
     
     destruct c as [s0 p]; destruct p as [s1 p];
     destruct p as [s2 p]; destruct p as [s3 p];

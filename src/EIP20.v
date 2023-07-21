@@ -12,7 +12,7 @@ Sends To (* *) ;
 Inherits (* *) ; 
 Types (*  *);
 Constants 
-Definition MAX_UINT256 : uint256 := (N.pow 10 256) - 1 ;
+Definition MAX_UINT256 : uint256 := (N.pow 10 256) - 1;
 
 Record Contract := {
     #[public] balances: mapping address uint256;

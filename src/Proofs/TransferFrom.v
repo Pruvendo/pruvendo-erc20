@@ -64,8 +64,8 @@ Tactic Notation "transferFrom_start"  constr(l) constr(l0) constr(l')  :=
     destruct p as [v8 p]; destruct p as [v9 p]; 
     destruct p as [v10 p]; destruct p as [v11 p]; 
     destruct p as [v12 p]; destruct p as [v13 p]; 
-    destruct p as [v14 p]; destruct p as [v15 v16]; 
-    
+    destruct p as [v14 p]; destruct p as [v15 p]; 
+    destruct p as [v16 v17];
     destruct c as [s0 p]; destruct p as [s1 p];
     destruct p as [s2 p]; destruct p as [s3 p];
     destruct p as [s4 s5];  
@@ -278,7 +278,7 @@ Proof.
     2: refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)).
     2: reflexivity.
 
-    erewrite lookup_some_find with (k:=v4).
+    erewrite lookup_some_find with (k:=v5).
     reflexivity.
 
     unshelve erewrite lookup_addAdjust.
