@@ -51,6 +51,75 @@ return.
 Defined.
 Sync.
 
+#[public]
+Ursus Definition var_test1 (arg1: uint256) (arg2: uint256)
+                           (arg3: uint256) (arg4: uint256)
+                           (arg5: uint256) (arg6: uint256): UExpression PhantomType false.
+{
+    :://  arg1 := {0} .
+    :://  arg2 := {0} .    
+    :://  arg3 := {0} |.    
+}
+return.
+Defined.
+Sync.
+
+
+#[public]
+Ursus Definition var_test2 : UExpression PhantomType false.
+{
+    ::// var arg1 : uint256; _ |.  
+    ::// var arg2 : uint256; _ |.
+    ::// var arg3 : uint256; _ |.
+    ::// var arg4 : uint256; _ |.
+    ::// var arg5 : uint256; _ |.
+    ::// var arg6 : uint256; _ |.
+
+    (* ::// require_ (arg1 > arg2). *)
+
+    :://  arg1 := {0} .
+    :://  arg2 := {0} .    
+    :://  arg3 := {0} |.
+}
+return.
+Defined.
+Sync.
+
+#[public]
+Ursus Definition var_test3 (arg1: uint256) (arg2: uint256)
+                           (arg3: uint256) (arg4: uint256)
+                           (arg5: uint256) (arg6: uint256) : UExpression PhantomType false.
+{
+    ::// var arg11 : uint256; _ |.  
+    ::// var arg22 : uint256; _ |.
+    ::// var arg33 : uint256; _ |.
+    ::// var arg44 : uint256; _ |.
+    ::// var arg55 : uint256; _ |.
+    ::// var arg66 : uint256; _ |.
+    ::// {var_test2}  |.
+}
+return.
+Defined.
+Sync.
+
+#[public]
+Ursus Definition var_test4 (arg1: uint256) (arg2: uint256)
+                           (arg3: uint256) (arg4: uint256)
+                           (arg5: uint256) (arg6: uint256) : UExpression PhantomType false.
+{
+    ::// var arg11 : uint256; _ |.  
+    ::// var arg22 : uint256; _ |.
+    ::// var arg33 : uint256; _ |.
+    ::// var arg44 : uint256; _ |.
+    ::// var arg55 : uint256; _ |.
+    ::// var arg66 : uint256; _ |.
+    ::// arg1 := {0} |.
+}
+return.
+Defined.
+Sync.
+
+
 #[override, public, nonpayable, returns = success]
 Ursus Definition transfer (_to :  address) 
                           (_value :  uint256): UExpression boolean true .
@@ -64,6 +133,39 @@ Ursus Definition transfer (_to :  address)
 return.
 Defined.
 Sync.
+
+
+(* #[override, public, nonpayable,  returns = success] *)
+Definition transferFrom_ls_payload (_from : ULValue address) 
+                               (_to : ULValue address) 
+                               (_value : ULValue uint256)
+                               (_success: ULValue boolean)
+                               (_allowance : ULValue uint256) : UExpression boolean true.
+    
+    ::// {_allowance} := allowed[[_from]][[msg->sender]] ; _ |.
+    :://  require_(((balances[[_from]] >= _value) && ({_allowance} >= _value))) .
+    :://  balances[[_to]] += _value .
+    :://  balances[[_from]] -= _value .
+    :://  if ( {_allowance} < MAX_UINT256 ) then 
+          {
+            allowed[[_from]][[msg->sender]] -= _value
+          } .    
+    :://  _success := @true |.
+Defined.
+(*  *)
+
+#[override, public, nonpayable,  returns = success]
+Ursus Definition transferFrom_ls_template (_from :  address) 
+                                      (_to :  address) 
+                                      (_value :  uint256): UExpression boolean true.
+{
+    :://  var allowance : uint256 ; _ |.
+    ::// {transferFrom_ls_payload _from _to _value  success allowance } |.
+}
+return.
+Defined.
+Sync.
+
 
 #[override, public, nonpayable,  returns = success]
 Ursus Definition transferFrom (_from :  address) 

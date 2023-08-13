@@ -10,13 +10,12 @@ Import EIP20.
 
 Require Import EvalExecs.Constructor.
 
-
 Opaque Common.hmapFindWithDefault
-        CommonInstances.addAdjustListPair
-        N.add N.sub N.leb N.ltb N.eqb Z.eqb.
+       CommonInstances.addAdjustListPair
+       N.add N.sub N.leb N.ltb N.eqb Z.eqb.
 
 Definition constructor_exec_computed: forall
-                             (_initialAmount :  uint256) 
+                            (_initialAmount :  uint256) 
                             (_tokenName :  string) 
                             (_decimalUnits :  uint8) 
                             (_tokenSymbol :  string)

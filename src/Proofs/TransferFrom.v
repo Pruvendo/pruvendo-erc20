@@ -1,8 +1,8 @@
 Require Import UrsusEnvironment.Solidity.current.Environment.
 Require Import UrsusEnvironment.Solidity.current.LocalGenerator.
 Require Import FinProof.Lib.HMapList.
-
 Require Import UMLang.ExecGenerator.
+
 Require Import Common.
 
 Require Import EIP20.
@@ -14,29 +14,6 @@ Opaque Common.hmapFindWithDefault
        CommonInstances.addAdjustListPair
        N.add N.sub N.leb N.ltb N.eqb Z.eqb N.pow.
 
-Definition transferFrom_exec_computed: forall
-                            (_from :  address)
-                            (_to :  address)
-                            (_value : uint256)
-                            (l: LedgerLRecord rec), {t: LedgerLRecord rec | t = transferFrom_exec _from _to _value {$$ l with Ledger_LocalState := default $$}}.
-Proof.        
-    intros. 
-    remember (transferFrom_exec _from _to _value {$$ l with Ledger_LocalState := default $$}).
-
-    destruct l. repeat destruct p.   
-    destruct v. repeat destruct p.
-    destruct c. repeat destruct p.  
-
-    unfold transferFrom_exec in Heql0.
-    lift_all in Heql0.    
-    compute in Heql0.
-    buint_all in Heql0.
-    symmetry in Heql0.
-    
-    match goal with
-    | Heql0: ?l = l0 |- _ => exact (@exist _ _ l Heql0)
-    end.
-Defined.
 
 Definition transferFrom_computed_prf (_from :  address)
                          (_to :  address) 
@@ -44,7 +21,7 @@ Definition transferFrom_computed_prf (_from :  address)
   proj1_sig (transferFrom_exec_computed _from _to _value l) = 
   exec_state (Uinterpreter (@transferFrom rec def _ _ _ _ _from _to _value)) {$$ l with Ledger_LocalState := default $$}.
 Proof. 
-  rewrite <- transferFrom_prf.
+  (* rewrite <- transferFrom_prf. *)
   destruct ((transferFrom_exec_computed _from _to _value l)).
   auto.
 Defined.

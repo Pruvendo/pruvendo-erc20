@@ -21,7 +21,7 @@ Definition constructor_exec_let (_initialAmount :  uint256)
                                 (_tokenName :  string) 
                                 (_decimalUnits :  uint8) 
                                 (_tokenSymbol :  string) (l : LedgerLRecord rec) : LedgerLRecord rec.
-  let_term_of_2 @constructor_exec_sig (constructor_exec_sig _initialAmount _tokenName _decimalUnits _tokenSymbol l).
+  let_term_of_2_fast @constructor_exec_sig (constructor_exec_sig _initialAmount _tokenName _decimalUnits _tokenSymbol l).
 Defined.
 
 Definition constructor_exec (_initialAmount :  uint256) 

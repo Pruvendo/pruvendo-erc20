@@ -15,7 +15,7 @@ Definition approve_exec_sig (_spender :  address) (_value :  uint256) (l : Ledge
 Defined.
 
 Definition approve_exec_let (_spender :  address) (_value :  uint256) (l : LedgerLRecord rec) : LedgerLRecord rec.
-  let_term_of_2 @approve_exec_sig (approve_exec_sig _spender _value l).
+  let_term_of_2_fast @approve_exec_sig (approve_exec_sig _spender _value l).
 Defined.
 
 Definition approve_exec (_spender :  address) (_value :  uint256) (l : LedgerLRecord rec) : LedgerLRecord rec.

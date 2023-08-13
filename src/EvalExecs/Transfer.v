@@ -18,7 +18,7 @@ Defined.
 
 Definition transfer_exec_let (_to :  address) 
                              (_value :  uint256) (l : LedgerLRecord rec) : LedgerLRecord rec.
-  let_term_of_2 @transfer_exec_sig (transfer_exec_sig _to _value l).
+  let_term_of_2_fast @transfer_exec_sig (transfer_exec_sig _to _value l).
 Defined.
 
 Definition transfer_exec (_to :  address) 
@@ -45,7 +45,7 @@ Defined.
 
 Definition transfer_eval_let (_to :  address) 
                              (_value :  uint256) (l : LedgerLRecord rec) : ControlResult bool true.
-  let_term_of_2 @transfer_eval_sig (transfer_eval_sig _to _value l).
+  let_term_of_2_fast @transfer_eval_sig (transfer_eval_sig _to _value l).
 Defined.
 
 Definition transfer_eval (_to :  address) 
