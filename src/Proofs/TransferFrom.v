@@ -3,9 +3,8 @@ Require Import UrsusEnvironment.Solidity.current.LocalGenerator.
 Require Import FinProof.Lib.HMapList.
 Require Import UMLang.ExecGenerator.
 
-Require Import Common.
-
 Require Import EIP20.
+Require Import Common.
 Import EIP20.
 
 Require Import EvalExecs.TransferFrom.
@@ -15,21 +14,18 @@ Opaque Common.hmapFindWithDefault
        N.add N.sub N.leb N.ltb N.eqb Z.eqb N.pow.
 
 
-Definition transferFrom_computed_prf (_from :  address)
+(* Definition transferFrom_computed_prf (_from :  address)
                          (_to :  address) 
                          (_value :  uint256) (l : LedgerLRecord rec) :
   proj1_sig (transferFrom_exec_computed _from _to _value l) = 
   exec_state (Uinterpreter (@transferFrom rec def _ _ _ _ _from _to _value)) {$$ l with Ledger_LocalState := default $$}.
 Proof. 
-  (* rewrite <- transferFrom_prf. *)
   destruct ((transferFrom_exec_computed _from _to _value l)).
   auto.
-Defined.
+Defined. *)
 
 Tactic Notation "transferFrom_start"  constr(l) constr(l0) constr(l')  :=
     (subst l'; subst l0;
-     rewrite <- transferFrom_computed_prf;
-    
     destruct l as [c p]; destruct p as [c0 p];
     destruct p as [m p]; destruct p as [m0 p];
     destruct p as [v p]; destruct p as [l l0];
@@ -45,10 +41,14 @@ Tactic Notation "transferFrom_start"  constr(l) constr(l0) constr(l')  :=
     destruct p as [v16 v17];
     destruct c as [s0 p]; destruct p as [s1 p];
     destruct p as [s2 p]; destruct p as [s3 p];
-    destruct p as [s4 s5];  
-
-    unfold transferFrom_exec_computed;
-    simpl proj1_sig;
+    destruct p as [s4 s5]; 
+    
+     rewrite transferFrom_exec_computed;
+     unfold transferFrom_ls_payload_exec_computed;
+     simpl uncurry;
+     unfold Datatypes.id;
+     unfold transferFrom_ls_payload_exec_computed_curried;
+    (* simpl proj1_sig; *)
     unfold LedgerLGetField;
     unfold ContractLGetField;
     simpl fold_apply;
@@ -82,9 +82,10 @@ Lemma transferFrom_set_from_balance: forall
                 xIntMinus _from_balance0 _value
         else _from_balance0.
 Proof. 
-    intros. transferFrom_start l l0 l'.    
-    compute_rhs.   
+    intros. 
+    transferFrom_start l l0 l'.
 
+    compute_rhs.   
     compute in _from_balance0, msg_sender.  
 
     match goal with
