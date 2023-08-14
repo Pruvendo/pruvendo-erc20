@@ -67,6 +67,8 @@ Definition transferFrom_ls_pre_payload_computed
                               (_value :  uint256)
                               (l: LedgerLRecord rec): LedgerLRecord rec.     
 remember l as ledger. destruct_ledger l.
+Print transferFrom_ls_pre_payload_computed_curried.
+
 refine (uncurry (f:=_GlobalClass) (transferFrom_ls_pre_payload_computed_curried _from _to _value)
       (s, (s0, (s1, (s2, (s3, (s4,
              (c0,
@@ -153,7 +155,7 @@ Proof.
   assert (u5 = _allowance) as H5.
   subst u5 u4 u3 u2 u1. auto.
 
-  rewrite H1, H2, H3, H4, H5. 
+  rewrite H1, H2, H3, H4, H5.   
   f_equal. auto.  
 Qed.  
 
@@ -220,11 +222,11 @@ Definition transferFrom_ls_payload_exec_computed' (_from_value _to_value: addres
 
   unfold xBoolIfElse in Heqexec.
   unfold boolFunRec in Heqexec. idtac.  
-  subst pre_exec _from _to _value _success _allowance. idtac.
+  subst pre_exec _from _to _value _success _allowance; idtac.
 
-  time "lift" lift_all in Heqexec. idtac.
-  time "compute" compute in Heqexec. idtac.
-  time "buint" buint_all in Heqexec. idtac.
+  time "lift" lift_all in Heqexec; idtac.
+  time "compute" compute in Heqexec; idtac.
+  time "buint" buint_all in Heqexec; idtac.
    
   (* symmetry in Heql1. idtac. *)     
   match goal with

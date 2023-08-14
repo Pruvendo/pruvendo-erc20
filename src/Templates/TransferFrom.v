@@ -148,6 +148,8 @@ Proof.
         apply transferFrom_ls_template_exec_correct_helper ).
   all: try now destruct_ledger l5.
 
+  Set Printing Implicit.
+
   Opaque Common._hmapFindWithDefault _addAdjustListPair.
 
   all: now (destruct_ledger l5; destruct_ledger l;
