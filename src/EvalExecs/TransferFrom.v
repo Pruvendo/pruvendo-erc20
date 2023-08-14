@@ -83,6 +83,8 @@ refine (uncurry (f:=_GlobalClass) (transferFrom_ls_pre_payload_computed_curried 
                        l1)))))))))))))))))))))))))))%xprod).
 Defined.
 
+About transferFrom_ls_payload.
+
 Lemma transferFrom_ls_template_by_payload: 
                        forall (_from_value :  address)
                               (_to_value :  address) 
@@ -141,14 +143,14 @@ Proof.
   assert (forall X (x:X) (b: bool), (if b then x else x) = x). intros; destruct b; auto.
   rewrite H0.
 
-  assert (u1 = _from) by auto.
-  assert (u2 = _to).
+  assert (u1 = _from) as H1 by auto.
+  assert (u2 = _to) as H2.
   subst u2 u1. auto.
-  assert (u3 = _value).
+  assert (u3 = _value) as H3.
   subst u3 u2 u1. auto.
-  assert (u4 = _success ).
+  assert (u4 = _success ) as H4.
   subst u4 u3 u2 u1. auto.
-  assert (u5 = _allowance).
+  assert (u5 = _allowance) as H5.
   subst u5 u4 u3 u2 u1. auto.
 
   rewrite H1, H2, H3, H4, H5. 

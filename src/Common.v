@@ -7,6 +7,61 @@ Require Import UMLang.ExecGenerator.
 Require Import EIP20.
 Import EIP20.
 
+
+Tactic Notation "destruct_ledger"  constr(ll) :=
+    (
+    let c := fresh "c" in
+    let c0 := fresh "c" in
+    let m := fresh "m" in
+    let m0 := fresh "m" in
+    let v := fresh "v" in
+    let l := fresh "l" in
+    let l0 := fresh "l" in
+    let v0 := fresh "v" in
+    let v1 := fresh "v" in
+    let v2 := fresh "v" in
+    let v3 := fresh "v" in
+    let v4 := fresh "v" in
+    let v5 := fresh "v" in
+    let v6 := fresh "v" in
+    let v7 := fresh "v" in
+    let v8 := fresh "v" in
+    let v9 := fresh "v" in
+    let v10 := fresh "v" in
+    let v11 := fresh "v" in
+    let v12 := fresh "v" in
+    let v13 := fresh "v" in
+    let v14 := fresh "v" in
+    let v15 := fresh "v" in
+    let v16 := fresh "v" in
+    let v17 := fresh "v" in
+
+    let s0 := fresh "s" in
+    let s1 := fresh "s" in
+    let s2 := fresh "s" in
+    let s3 := fresh "s" in
+    let s4 := fresh "s" in
+    let s5 := fresh "s" in
+
+    destruct ll as [c p]; destruct p as [c0 p];
+    destruct p as [m p]; destruct p as [m0 p];
+    destruct p as [v p]; destruct p as [l l0];
+
+    destruct v as [v0 p]; destruct p as [v1 p]; 
+    destruct p as [v2 p]; destruct p as [v3 p]; 
+    destruct p as [v4 p]; destruct p as [v5 p]; 
+    destruct p as [v6 p]; destruct p as [v7 p]; 
+    destruct p as [v8 p]; destruct p as [v9 p]; 
+    destruct p as [v10 p]; destruct p as [v11 p]; 
+    destruct p as [v12 p]; destruct p as [v13 p]; 
+    destruct p as [v14 p]; destruct p as [v15 p]; 
+    destruct p as [v16 v17];
+
+    destruct c as [s0 p]; destruct p as [s1 p];
+    destruct p as [s2 p]; destruct p as [s3 p];
+    destruct p as [s4 s5]).
+
+
 #[local]
 Existing Instance BoolEq.pair_eqb_spec.
 

@@ -14,74 +14,20 @@ Opaque Common.hmapFindWithDefault
        CommonInstances.addAdjustListPair
        N.add N.sub N.leb N.ltb N.eqb Z.eqb.
 
-Definition constructor_exec_computed: forall
-                            (_initialAmount :  uint256) 
-                            (_tokenName :  string) 
-                            (_decimalUnits :  uint8) 
-                            (_tokenSymbol :  string)
-                            (l: LedgerLRecord rec), {t: LedgerLRecord rec | t = constructor_exec _initialAmount _tokenName _decimalUnits _tokenSymbol {$$ l with Ledger_LocalState := default $$}}.
-Proof.        
-    intros. 
-    remember (constructor_exec _initialAmount _tokenName _decimalUnits _tokenSymbol {$$ l with Ledger_LocalState := default $$}).
-
-    destruct l. repeat destruct p.   
-    destruct v. repeat destruct p.
-    destruct c. repeat destruct p.  
-
-    unfold constructor_exec in Heql0.
-    lift_all in Heql0.    
-    compute in Heql0.
-    buint_all in Heql0.
-    symmetry in Heql0.
-    
-    match goal with
-    | Heql0: ?l = l0 |- _ => exact (@exist _ _ l Heql0)
-    end.
-Defined.
-
-Definition constructor_computed_prf  (_initialAmount :  uint256) 
-                            (_tokenName :  string) 
-                            (_decimalUnits :  uint8) 
-                            (_tokenSymbol :  string) (l : LedgerLRecord rec) :
-  proj1_sig (constructor_exec_computed _initialAmount _tokenName _decimalUnits _tokenSymbol l) = 
-  exec_state (Uinterpreter (@constructor rec def _ _ _ _initialAmount _tokenName _decimalUnits _tokenSymbol)) 
-  {$$ l with Ledger_LocalState := default $$}.
-Proof. 
-  rewrite <- constructor_prf.
-  destruct ((constructor_exec_computed _initialAmount _tokenName _decimalUnits _tokenSymbol l)).
-  auto.
-Defined.
-
 Tactic Notation "constructor_start"  constr(l) constr(l0) constr(l')  :=
-    (subst l'; subst l0;
-     rewrite <- constructor_computed_prf;
-    
-    destruct l as [c p]; destruct p as [c0 p];
-    destruct p as [m p]; destruct p as [m0 p];
-    destruct p as [v p]; destruct p as [l l0];
-
-    destruct v as [v0 p]; destruct p as [v1 p]; 
-    destruct p as [v2 p]; destruct p as [v3 p]; 
-    destruct p as [v4 p]; destruct p as [v5 p]; 
-    destruct p as [v6 p]; destruct p as [v7 p]; 
-    destruct p as [v8 p]; destruct p as [v9 p]; 
-    destruct p as [v10 p]; destruct p as [v11 p]; 
-    destruct p as [v12 p]; destruct p as [v13 p]; 
-    destruct p as [v14 p]; destruct p as [v15 p]; 
-    destruct p as [v16 v17];
-    
-    destruct c as [s0 p]; destruct p as [s1 p];
-    destruct p as [s2 p]; destruct p as [s3 p];
-    destruct p as [s4 s5];  
-
-    unfold constructor_exec_computed;
-    simpl proj1_sig;
-    unfold LedgerLGetField;
-    unfold ContractLGetField;
-    simpl fold_apply;
-    unfold ClassGeneratorsCommon.CountableMoreAll_obligation_3;
-    unfold LedgerFields_rect;
-    unfold ContractFields_rect).
+    (subst l'; subst l0; destruct_ledger l;  
+     rewrite constructor_exec_computed;
+     unfold constructor_ls_payload_exec_computed;
+     simpl uncurry;
+     unfold Datatypes.id;
+     unfold constructor_ls_payload_exec_computed_curried;
+    (* simpl proj1_sig; *)
+     unfold LedgerLGetField;
+     unfold ContractLGetField;
+     simpl fold_apply;
+     unfold ClassGeneratorsCommon.CountableMoreAll_obligation_3;
+     unfold LedgerFields_rect;
+     unfold ContractFields_rect).
 
 Tactic Notation "compute_rhs" := 
 (match goal with 
@@ -201,7 +147,7 @@ Proof.
     compute_rhs.
     compute in a_balance0, msg_sender. 
 
-    remember (s0 [a] ?).
+    remember (s [a] ?).
     destruct y.
     + erewrite lookup_some_find.
     reflexivity. 

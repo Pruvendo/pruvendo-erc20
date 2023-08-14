@@ -51,74 +51,29 @@ return.
 Defined.
 Sync.
 
-#[public]
-Ursus Definition var_test1 (arg1: uint256) (arg2: uint256)
-                           (arg3: uint256) (arg4: uint256)
-                           (arg5: uint256) (arg6: uint256): UExpression PhantomType false.
+Definition constructor_ls_payload (_initialAmount : ULValue uint256) 
+                                  (_tokenName : ULValue string) 
+                                  (_decimalUnits : ULValue uint8) 
+                                  (_tokenSymbol : ULValue string) : UExpression PhantomType false.
+    :://  balances[[msg->sender]] := _initialAmount .
+    :://  totalSupply := _initialAmount .
+    :://  name := _tokenName .
+    :://  decimals := _decimalUnits .
+    :://  symbol := _tokenSymbol |.
+Defined.
+
+
+#[override (* ??? *), public, nonpayable]
+Ursus Definition constructor_ls_template (_initialAmount :  uint256) 
+                             (_tokenName :  string) 
+                             (_decimalUnits :  uint8) 
+                             (_tokenSymbol :  string) : UExpression PhantomType false.
 {
-    :://  arg1 := {0} .
-    :://  arg2 := {0} .    
-    :://  arg3 := {0} |.    
+    ::// {constructor_ls_payload _initialAmount _tokenName _decimalUnits _tokenSymbol} |.     
 }
 return.
 Defined.
 Sync.
-
-
-#[public]
-Ursus Definition var_test2 : UExpression PhantomType false.
-{
-    ::// var arg1 : uint256; _ |.  
-    ::// var arg2 : uint256; _ |.
-    ::// var arg3 : uint256; _ |.
-    ::// var arg4 : uint256; _ |.
-    ::// var arg5 : uint256; _ |.
-    ::// var arg6 : uint256; _ |.
-
-    (* ::// require_ (arg1 > arg2). *)
-
-    :://  arg1 := {0} .
-    :://  arg2 := {0} .    
-    :://  arg3 := {0} |.
-}
-return.
-Defined.
-Sync.
-
-#[public]
-Ursus Definition var_test3 (arg1: uint256) (arg2: uint256)
-                           (arg3: uint256) (arg4: uint256)
-                           (arg5: uint256) (arg6: uint256) : UExpression PhantomType false.
-{
-    ::// var arg11 : uint256; _ |.  
-    ::// var arg22 : uint256; _ |.
-    ::// var arg33 : uint256; _ |.
-    ::// var arg44 : uint256; _ |.
-    ::// var arg55 : uint256; _ |.
-    ::// var arg66 : uint256; _ |.
-    ::// {var_test2}  |.
-}
-return.
-Defined.
-Sync.
-
-#[public]
-Ursus Definition var_test4 (arg1: uint256) (arg2: uint256)
-                           (arg3: uint256) (arg4: uint256)
-                           (arg5: uint256) (arg6: uint256) : UExpression PhantomType false.
-{
-    ::// var arg11 : uint256; _ |.  
-    ::// var arg22 : uint256; _ |.
-    ::// var arg33 : uint256; _ |.
-    ::// var arg44 : uint256; _ |.
-    ::// var arg55 : uint256; _ |.
-    ::// var arg66 : uint256; _ |.
-    ::// arg1 := {0} |.
-}
-return.
-Defined.
-Sync.
-
 
 #[override, public, nonpayable, returns = success]
 Ursus Definition transfer (_to :  address) 
@@ -182,48 +137,6 @@ Ursus Definition transferFrom (_from :  address)
           } .
     (* :://  Transfer(_from, _to, _value). *)
     :://  success := @true |.
-}
-return.
-Defined.
-Sync.
-
-
-#[override, public, nonpayable, returns = success]
-Ursus Definition transfer' (_to :  address) 
-                           (_value :  uint256)
-                           (b: bool): UExpression boolean true .
-{
-    :://  require_ ( b ) .    
-    :://  balances [[ msg->sender ]] -=  _value .
-    :://  balances [[ _to ]] += _value .    
-    :://  success := @true |.
-}
-return.
-Defined.
-Sync.
-
-#[override, public, nonpayable, returns = success]
-Ursus Definition transfer1 (_to :  address) 
-                          (_value :  uint256): UExpression boolean true .
-{
-    ::// success := transfer' (_to, _value, balances [[msg->sender]] >= _value) |.
-}
-return.
-Defined.
-Sync.
-
-#[override, public, nonpayable, returns = success]
-Ursus Definition transferFrom1 (_from :  address) 
-                              (_to :  address) 
-                              (_value :  uint256): UExpression boolean true.
-{
-    ::// var allowance : uint256  := allowed[[_from]][[msg->sender]] ; _ |.
-    ::// success := transfer' (_to, _value, ((balances[[_from]] >= _value) && 
-                                            ({allowance} >= _value))) .
-    ::// if ( {allowance} < MAX_UINT256 ) then 
-          {
-            allowed[[_from]][[msg->sender]] -= _value
-          } |.
 }
 return.
 Defined.

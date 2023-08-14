@@ -13,48 +13,20 @@ Opaque Common.hmapFindWithDefault
        CommonInstances.addAdjustListPair
        N.add N.sub N.leb N.ltb N.eqb Z.eqb N.pow.
 
-
-(* Definition transferFrom_computed_prf (_from :  address)
-                         (_to :  address) 
-                         (_value :  uint256) (l : LedgerLRecord rec) :
-  proj1_sig (transferFrom_exec_computed _from _to _value l) = 
-  exec_state (Uinterpreter (@transferFrom rec def _ _ _ _ _from _to _value)) {$$ l with Ledger_LocalState := default $$}.
-Proof. 
-  destruct ((transferFrom_exec_computed _from _to _value l)).
-  auto.
-Defined. *)
-
 Tactic Notation "transferFrom_start"  constr(l) constr(l0) constr(l')  :=
-    (subst l'; subst l0;
-    destruct l as [c p]; destruct p as [c0 p];
-    destruct p as [m p]; destruct p as [m0 p];
-    destruct p as [v p]; destruct p as [l l0];
-
-    destruct v as [v0 p]; destruct p as [v1 p]; 
-    destruct p as [v2 p]; destruct p as [v3 p]; 
-    destruct p as [v4 p]; destruct p as [v5 p]; 
-    destruct p as [v6 p]; destruct p as [v7 p]; 
-    destruct p as [v8 p]; destruct p as [v9 p]; 
-    destruct p as [v10 p]; destruct p as [v11 p]; 
-    destruct p as [v12 p]; destruct p as [v13 p]; 
-    destruct p as [v14 p]; destruct p as [v15 p]; 
-    destruct p as [v16 v17];
-    destruct c as [s0 p]; destruct p as [s1 p];
-    destruct p as [s2 p]; destruct p as [s3 p];
-    destruct p as [s4 s5]; 
-    
+    (subst l'; subst l0; destruct_ledger l;  
      rewrite transferFrom_exec_computed;
      unfold transferFrom_ls_payload_exec_computed;
      simpl uncurry;
      unfold Datatypes.id;
      unfold transferFrom_ls_payload_exec_computed_curried;
     (* simpl proj1_sig; *)
-    unfold LedgerLGetField;
-    unfold ContractLGetField;
-    simpl fold_apply;
-    unfold ClassGeneratorsCommon.CountableMoreAll_obligation_3;
-    unfold LedgerFields_rect;
-    unfold ContractFields_rect).
+     unfold LedgerLGetField;
+     unfold ContractLGetField;
+     simpl fold_apply;
+     unfold ClassGeneratorsCommon.CountableMoreAll_obligation_3;
+     unfold LedgerFields_rect;
+     unfold ContractFields_rect).
 
 Tactic Notation "compute_rhs" := 
 (match goal with 
@@ -106,7 +78,7 @@ Proof.
     unshelve erewrite lookup_addAdjust.
     refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)).
 
-    remember (s0 [_from] ?).
+    remember (s [_from] ?).
     destruct y.
     + erewrite lookup_some_find.
     reflexivity. 
@@ -135,7 +107,7 @@ Proof.
     unshelve erewrite lookup_addAdjust.
     refine (BoolEq.pair_eqb_spec (X:=Z) (Y:=XUBInteger 256)).
 
-    remember (s0 [_from] ?).
+    remember (s [_from] ?).
     destruct y.
     + erewrite lookup_some_find.
     reflexivity. 
@@ -471,7 +443,7 @@ Proof.
     end.    
     
     destruct b0.
-    - remember (s0[_from]?).
+    - remember (s[_from]?).
       destruct y.
       + erewrite lookup_some_find.
         2: erewrite lookup_addAdjust_another; auto.
@@ -485,7 +457,7 @@ Proof.
         2: erewrite lookup_addAdjust_another; auto.
         erewrite lookup_none_find with (k:=_from).
         auto. auto.
-    - remember (s0[_from]?).
+    - remember (s[_from]?).
       destruct y.
       + erewrite lookup_some_find.
         2: erewrite lookup_addAdjust_another; auto.
@@ -533,7 +505,7 @@ Proof.
     rewrite H.
     destruct b0.
 
-    - remember (s0[_to]?).
+    - remember (s[_to]?).
       destruct y.
       + erewrite lookup_some_find.
         2: erewrite lookup_addAdjust; auto.        
@@ -546,7 +518,7 @@ Proof.
         | |- context [@addAdjustListPair _ _ _ ?a ?v _] => remember v
         end.
         enough (x0 = x).
-        destruct s0.
+        destruct s.
         erewrite member_addAdjust; auto.
         rewrite H3. auto.
         subst x0.
@@ -557,7 +529,7 @@ Proof.
         destruct H1.
         setoid_rewrite H in Heqy.
         discriminate.
-    - remember (s0[_to]?).
+    - remember (s[_to]?).
       destruct y.
       + erewrite lookup_some_find.
         2: erewrite lookup_addAdjust; auto.        
@@ -570,7 +542,7 @@ Proof.
         | |- context [@addAdjustListPair _ _ _ ?a ?v _] => remember v
         end.
         enough (x0 = x).
-        destruct s0.
+        destruct s.
         erewrite member_addAdjust; auto.
         rewrite H3. auto.
         subst x0.
@@ -643,7 +615,7 @@ Proof.
     simpl default.
     f_equal.
     remember ((uint2N _value <=?
-          uint2N (Common.hmapFindWithDefault (Build_XUBInteger 0) _to s0))%N).
+          uint2N (Common.hmapFindWithDefault (Build_XUBInteger 0) _to s))%N).
     setoid_rewrite <- Heqb1 in Heqb.
     destruct b0.
     + erewrite lookup_none_find with (k:=_to) in Heqb1.
@@ -676,7 +648,7 @@ Proof.
     simpl default.
     f_equal.
     remember ((uint2N _value <=?
-          uint2N (Common.hmapFindWithDefault (Build_XUBInteger 0) _to s0))%N).
+          uint2N (Common.hmapFindWithDefault (Build_XUBInteger 0) _to s))%N).
     setoid_rewrite <- Heqb1 in Heqb.
     destruct b0.
     + erewrite lookup_none_find with (k:=_to) in Heqb1.
